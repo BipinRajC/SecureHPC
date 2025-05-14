@@ -1,0 +1,23 @@
+{
+  "hardening_index": 82,
+  "warnings": [
+    "SSH configuration: PermitRootLogin is enabled",
+    "Default umask configuration in /etc/profile is too permissive",
+    "Core dumps are not restricted",
+    "File permissions on critical system files are too permissive"
+  ],
+  "suggestions": [
+    "Consider hardening SSH configuration by disabling root login",
+    "Set more restrictive umask defaults",
+    "Configure system to disable core dumps",
+    "Adjust file permissions on critical system files"
+  ],
+  "tests_performed": 276,
+  "plugins_enabled": [
+    "ssl",
+    "file_integrity",
+    "malware"
+  ],
+  "report_datetime_start": "2025-05-08T16:17:29.968Z",
+  "report_datetime_end": "2025-05-08T16:18:29.968Z"
+}

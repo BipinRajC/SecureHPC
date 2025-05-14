@@ -1,0 +1,107 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-background-dark text-neutral-100 min-h-screen font-sans antialiased;
+}
+
+#root {
+  @apply min-h-screen flex flex-col;
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-colors duration-200;
+  }
+
+  .btn-primary {
+    @apply btn bg-primary-500 text-white hover:bg-primary-600 focus:ring-2 focus:ring-primary-400 focus:ring-opacity-50;
+  }
+
+  .btn-secondary {
+    @apply btn bg-secondary-500 text-white hover:bg-secondary-600 focus:ring-2 focus:ring-secondary-400 focus:ring-opacity-50;
+  }
+
+  .btn-outline {
+    @apply btn border border-neutral-600 text-neutral-200 hover:bg-neutral-700;
+  }
+
+  .btn-danger {
+    @apply btn bg-error-500 text-white hover:bg-error-600;
+  }
+
+  .card {
+    @apply bg-background-card rounded-lg shadow-card p-4 md:p-6;
+  }
+
+  .input {
+    @apply bg-background-light border border-neutral-700 rounded-md px-3 py-2 text-neutral-100 
+    focus:outline-none focus:ring-2 focus:ring-primary-400;
+  }
+
+  .select {
+    @apply bg-background-light border border-neutral-700 rounded-md px-3 py-2 text-neutral-100
+    focus:outline-none focus:ring-2 focus:ring-primary-400;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+
+  .badge-success {
+    @apply badge bg-success-900 text-success-100;
+  }
+
+  .badge-warning {
+    @apply badge bg-warning-900 text-warning-100;
+  }
+
+  .badge-error {
+    @apply badge bg-error-900 text-error-100;
+  }
+
+  .badge-neutral {
+    @apply badge bg-neutral-700 text-neutral-200;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-background-dark;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-neutral-700 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-neutral-600;
+}
+
+/* Animation classes */
+.fade-enter {
+  opacity: 0;
+}
+.fade-enter-active {
+  opacity: 1;
+  transition: opacity 200ms;
+}
+.fade-exit {
+  opacity: 1;
+}
+.fade-exit-active {
+  opacity: 0;
+  transition: opacity 200ms;
+}
