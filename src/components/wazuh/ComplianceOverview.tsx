@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import { ShieldCheck, ShieldX, Info } from 'lucide-react';
+import { ShieldCheck, ShieldX, Info, Download, FileJson } from 'lucide-react';
+import axios from 'axios';
 
 interface ComplianceOverviewProps {
   agent: any;
@@ -66,9 +67,77 @@ const ComplianceOverview: React.FC<ComplianceOverviewProps> = ({ agent }) => {
     ? Math.round((complianceData.pass / (complianceData.pass + complianceData.fail)) * 100)
     : 0;
 
+  // Function to download JSON compliance data
+  const downloadJsonReport = async () => {
+    if (!agent?.info?.id || !selectedFramework) return;
+    
+    try {
+      // First get the list of policies
+      const scaPoliciesResponse = await axios.get(
+        `http://localhost:3001/api/tools/wazuh/agents/${agent.info.id}/sca`
+      );
+      
+      if (scaPoliciesResponse.data.status !== 'ok') {
+        throw new Error('Failed to fetch SCA policies');
+      }
+      
+      const policies = scaPoliciesResponse.data.data.data.affected_items || [];
+      
+      if (policies.length === 0) {
+        alert('No SCA policies available for this agent');
+        return;
+      }
+      
+      // Select the first policy (you can change this to match by name if needed)
+      const policy = policies[0];
+      
+      // Fetch detailed checks for the selected policy
+      const checksResponse = await axios.get(
+        `http://localhost:3001/api/tools/wazuh/agents/${agent.info.id}/sca/${policy.policy_id}/checks`
+      );
+      
+      if (checksResponse.data.status !== 'ok') {
+        throw new Error('Failed to fetch SCA checks');
+      }
+      
+      // Create a JSON blob and download it
+      const jsonData = checksResponse.data.data;
+      const jsonString = JSON.stringify(jsonData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `sca-checks-agent-${agent.info.id}-policy-${policy.policy_id}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+    } catch (error) {
+      console.error('Error downloading JSON report:', error);
+      alert('Failed to download JSON report. Please try again.');
+    }
+  };
+
   return (
     <div className="card">
-      <h2 className="text-lg font-medium text-white mb-4">Compliance Status</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-medium text-white">Compliance Status</h2>
+        
+        {agent?.info?.id && (
+          <div className="flex space-x-2">
+            <button 
+              onClick={downloadJsonReport}
+              className="flex items-center px-3 py-1.5 rounded text-sm text-neutral-300 bg-neutral-800 hover:bg-neutral-700 transition-colors"
+              title="Export JSON compliance report"
+            >
+              <FileJson className="h-4 w-4 mr-1.5" />
+              Export JSON
+            </button>
+          </div>
+        )}
+      </div>
       
       <div className="flex flex-col lg:flex-row">
         <div className="lg:w-1/3 mb-6 lg:mb-0">

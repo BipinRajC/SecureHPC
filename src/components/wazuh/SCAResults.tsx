@@ -124,7 +124,11 @@ const SCAResults: React.FC<SCAResultsProps> = ({ agent }) => {
   };
 
   // Get severity badge color
-  const getSeverityColor = (severity: string) => {
+  const getSeverityColor = (severity: string | undefined) => {
+    if (!severity) {
+      // fallback color for missing severity
+      return 'bg-neutral-900 text-neutral-400 border-neutral-800';
+    }
     switch (severity.toLowerCase()) {
       case 'critical':
         return 'bg-error-800 text-error-300 border-error-700';
@@ -331,8 +335,8 @@ const SCAResults: React.FC<SCAResultsProps> = ({ agent }) => {
                         {rule.title}
                       </td>
                       <td className="px-4 py-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSeverityColor(rule.severity)}`}>
-                          {rule.severity}
+                        <span className={`px-2 py-1 rounded ${getSeverityColor(rule.severity)}`}>
+                          {rule.severity || 'N/A'}
                         </span>
                       </td>
                       <td className="px-4 py-3">

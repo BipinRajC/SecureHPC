@@ -289,11 +289,11 @@ class WazuhService {
     return this.request('get', `/sca/${formattedAgentId}`);
   }
 
-  // Get SCA results for a specific policy
-  async getAgentSCAResults(agentId, policyId) {
+  // Get detailed SCA checks for a specific policy
+  async getAgentSCAChecks(agentId, policyId) {
     const formattedAgentId = this.formatAgentId(agentId);
-    console.log(`Requesting SCA results for agent ID: ${formattedAgentId}, policy ID: ${policyId}`);
-    return this.request('get', `/sca/${formattedAgentId}/results/${policyId}`);
+    console.log(`Requesting detailed SCA checks for agent ID: ${formattedAgentId}, policy ID: ${policyId}`);
+    return this.request('get', `/sca/${formattedAgentId}/checks/${policyId}`);
   }
 
   // Get Wazuh rules for compliance frameworks
@@ -318,6 +318,34 @@ class WazuhService {
       console.error('Error triggering SCA scan:', error);
       throw new Error(`Failed to trigger SCA scan: ${error.message}`);
     }
+  }
+
+  // Get network interface statistics for an agent
+  async getAgentNetiface(agentId) {
+    const formattedAgentId = this.formatAgentId(agentId);
+    console.log(`Requesting netiface info for agent ID: ${formattedAgentId}`);
+    return this.request('get', `/syscollector/${formattedAgentId}/netiface`);
+  }
+
+  // Get network protocol info for an agent
+  async getAgentNetproto(agentId) {
+    const formattedAgentId = this.formatAgentId(agentId);
+    console.log(`Requesting netproto info for agent ID: ${formattedAgentId}`);
+    return this.request('get', `/syscollector/${formattedAgentId}/netproto`);
+  }
+
+  // Get syscheck info for an agent
+  async getAgentSyscheck(agentId) {
+    const formattedAgentId = this.formatAgentId(agentId);
+    console.log(`Requesting syscheck info for agent ID: ${formattedAgentId}`);
+    return this.request('get', `/syscheck/${formattedAgentId}`);
+  }
+
+  // Get SCA results for a specific policy (correct endpoint)
+  async getAgentSCAResults(agentId, policyId) {
+    const formattedAgentId = this.formatAgentId(agentId);
+    console.log(`Requesting SCA results for agent ID: ${formattedAgentId}, policy ID: ${policyId}`);
+    return this.request('get', `/sca/${formattedAgentId}/checks/${policyId}`);
   }
 
   // Clean up resources

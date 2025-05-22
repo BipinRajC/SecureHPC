@@ -257,19 +257,19 @@ export const mockAssessments: Assessment[] = [
     },
     result: {
       score: 85,
-      findings: [
-        {
+    findings: [
+      {
           controlId: 'AUTH-01',
           status: 'non-compliant' as ComplianceStatus,
           details: 'Password policy not enforced',
-          severity: 'high'
-        },
-        {
+        severity: 'high'
+      },
+      {
           controlId: 'ENCR-02',
           status: 'compliant' as ComplianceStatus,
           details: 'Disk encryption enabled',
           severity: 'medium'
-        }
+      }
       ]
     }
   },

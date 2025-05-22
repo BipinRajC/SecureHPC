@@ -9,6 +9,7 @@ import SCAResults from '../components/wazuh/SCAResults';
 import ProcessesTable from '../components/wazuh/ProcessesTable';
 import PortsTable from '../components/wazuh/PortsTable';
 import { Loader2, AlertTriangle, RefreshCw } from 'lucide-react';
+import AgentMetrics from '../components/wazuh/AgentMetrics';
 
 const WazuhResult: React.FC = () => {
   const navigate = useNavigate();
@@ -109,7 +110,10 @@ const WazuhResult: React.FC = () => {
         ports: [],
         packages: [],
         processes: [],
-        sca: []
+        sca: [],
+        netiface: [],
+        netproto: [],
+        syscheck: []
       };
       
       // Get agent basic info from the agents list instead of a direct API call
@@ -193,6 +197,36 @@ const WazuhResult: React.FC = () => {
         const scaResponse = await axios.get(`http://localhost:3001/api/tools/wazuh/agents/${agentId}/sca`);
         if (scaResponse.data.status === 'ok') {
           agentData.sca = scaResponse.data.data.data.affected_items || [];
+        }
+        
+        console.log(`Fetching netiface for agent ${agentId}...`);
+        const netifaceResponse = await axios.get(`http://localhost:3001/api/tools/wazuh/agents/${agentId}/netiface`);
+        if (netifaceResponse.data.status === 'ok') {
+          agentData.netiface = netifaceResponse.data.data.data.affected_items || [];
+        }
+        
+        console.log(`Fetching netproto for agent ${agentId}...`);
+        const netprotoResponse = await axios.get(`http://localhost:3001/api/tools/wazuh/agents/${agentId}/netproto`);
+        if (netprotoResponse.data.status === 'ok') {
+          agentData.netproto = netprotoResponse.data.data.data.affected_items || [];
+        }
+        
+        console.log(`Fetching syscheck for agent ${agentId}...`);
+        const syscheckResponse = await axios.get(`http://localhost:3001/api/tools/wazuh/agents/${agentId}/syscheck`);
+        if (syscheckResponse.data.status === 'ok') {
+          // Syscheck: sort by date desc, take latest 10
+          const syscheckItems = syscheckResponse.data.data.data.affected_items || [];
+          const files = syscheckItems
+            .filter((f: any) => f.date)
+            .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
+            .slice(0, 10)
+            .map((f: any) => ({
+              file: f.file,
+              perm: f.perm,
+              md5: f.md5,
+              mtime: f.date
+            }));
+          agentData.syscheck = files;
         }
         
         // If we have the basic agent info from the list and at least one additional data source,

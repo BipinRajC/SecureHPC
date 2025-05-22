@@ -83,6 +83,10 @@ const SystemInformation: React.FC<SystemInformationProps> = ({ agent }) => {
     return agent.packages.length > 0 ? `${agent.packages.length}+` : '0';
   };
 
+  // Debug logging
+  console.log('SystemInformation agent:', agent);
+  console.log('SystemInformation agent.info.id:', agent?.info?.id);
+
   return (
     <div className="card h-full">
       <h2 className="text-lg font-medium text-white mb-4">System Information</h2>
@@ -290,6 +294,104 @@ const SystemInformation: React.FC<SystemInformationProps> = ({ agent }) => {
           No system information available
         </div>
       )}
+      {/* Additional system info */}
+      <div className="mt-4">
+        <h3 className="text-neutral-100 font-medium mb-2">Additional System Metrics</h3>
+        {/* Netiface */}
+        <div className="mb-4">
+          <h4 className="text-neutral-200 font-medium mb-1">Network Interface Stats</h4>
+          {(!agent.netiface || agent.netiface.length === 0) ? (
+            <div className="text-neutral-500">No network interface data available.</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-xs">
+                <thead>
+                  <tr className="text-neutral-400">
+                    <th className="px-2 py-1 text-left">Iface</th>
+                    <th className="px-2 py-1 text-right">RX Packets</th>
+                    <th className="px-2 py-1 text-right">TX Packets</th>
+                    <th className="px-2 py-1 text-right">RX Bytes</th>
+                    <th className="px-2 py-1 text-right">TX Bytes</th>
+                    <th className="px-2 py-1 text-right">RX Dropped</th>
+                    <th className="px-2 py-1 text-right">TX Dropped</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {agent.netiface.map((iface: any, idx: number) => (
+                    <tr key={(iface.name || iface.iface || idx)} className="border-t border-neutral-800">
+                      <td className="px-2 py-1 font-mono">{iface.name || iface.iface || 'N/A'}</td>
+                      <td className="px-2 py-1 text-right">{iface.rx?.packets ?? ''}</td>
+                      <td className="px-2 py-1 text-right">{iface.tx?.packets ?? ''}</td>
+                      <td className="px-2 py-1 text-right">{iface.rx?.bytes ?? ''}</td>
+                      <td className="px-2 py-1 text-right">{iface.tx?.bytes ?? ''}</td>
+                      <td className="px-2 py-1 text-right">{iface.rx?.dropped ?? ''}</td>
+                      <td className="px-2 py-1 text-right">{iface.tx?.dropped ?? ''}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+        {/* Netproto */}
+        <div className="mb-4">
+          <h4 className="text-neutral-200 font-medium mb-1">Network Protocols</h4>
+          {(!agent.netproto || agent.netproto.length === 0) ? (
+            <div className="text-neutral-500">No network protocol data available.</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-xs">
+                <thead>
+                  <tr className="text-neutral-400">
+                    <th className="px-2 py-1 text-left">Iface</th>
+                    <th className="px-2 py-1 text-left">Type</th>
+                    <th className="px-2 py-1 text-left">Gateway</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {agent.netproto.map((proto: any, idx: number) => (
+                    <tr key={proto.iface + idx} className="border-t border-neutral-800">
+                      <td className="px-2 py-1 font-mono">{proto.iface}</td>
+                      <td className="px-2 py-1">{proto.type}</td>
+                      <td className="px-2 py-1">{proto.gateway}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+        {/* Syscheck */}
+        <div className="mb-4">
+          <h4 className="text-neutral-200 font-medium mb-1">Recent File Integrity Changes</h4>
+          {(!agent.syscheck || agent.syscheck.length === 0) ? (
+            <div className="text-neutral-500">No recent file changes detected.</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-xs">
+                <thead>
+                  <tr className="text-neutral-400">
+                    <th className="px-2 py-1 text-left">File Path</th>
+                    <th className="px-2 py-1 text-left">Perms</th>
+                    <th className="px-2 py-1 text-left">MD5</th>
+                    <th className="px-2 py-1 text-left">Modified</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {agent.syscheck.map((file: any, idx: number) => (
+                    <tr key={(file.file || file.path || idx)} className="border-t border-neutral-800">
+                      <td className="px-2 py-1 font-mono truncate max-w-[200px]" title={file.file || file.path}>{file.file || file.path || 'N/A'}</td>
+                      <td className="px-2 py-1">{file.perm || file.perms || ''}</td>
+                      <td className="px-2 py-1 font-mono truncate max-w-[120px]" title={file.md5}>{file.md5}</td>
+                      <td className="px-2 py-1">{file.mtime ? new Date(file.mtime).toLocaleString() : ''}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

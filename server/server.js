@@ -290,6 +290,25 @@ app.get('/api/tools/wazuh/agents/:agentId/sca/:policyId', async (req, res) => {
   }
 });
 
+app.get('/api/tools/wazuh/agents/:agentId/sca/:policyId/checks', async (req, res) => {
+  try {
+    const { agentId, policyId } = req.params;
+    const scaChecks = await wazuhService.getAgentSCAChecks(agentId, policyId);
+    res.json({
+      status: 'ok',
+      data: scaChecks
+    });
+  } catch (error) {
+    console.error(`Error fetching detailed SCA checks for agent ${req.params.agentId}, policy ${req.params.policyId}: ${error.message}`);
+    res.status(error.message.includes('404') ? 404 : 500).json({
+      status: 'error',
+      message: error.message,
+      agentId: req.params.agentId,
+      policyId: req.params.policyId
+    });
+  }
+});
+
 app.get('/api/tools/wazuh/compliance/:framework', async (req, res) => {
   try {
     const { framework } = req.params;
@@ -318,6 +337,60 @@ app.get('/api/tools/wazuh/status', (req, res) => {
     res.status(500).json({
       status: 'error',
       message: error.message
+    });
+  }
+});
+
+app.get('/api/tools/wazuh/agents/:agentId/netiface', async (req, res) => {
+  try {
+    const { agentId } = req.params;
+    const netiface = await wazuhService.getAgentNetiface(agentId);
+    res.json({
+      status: 'ok',
+      data: netiface
+    });
+  } catch (error) {
+    console.error(`Error fetching netiface for agent ${req.params.agentId}: ${error.message}`);
+    res.status(error.message.includes('404') ? 404 : 500).json({
+      status: 'error',
+      message: error.message,
+      agentId: req.params.agentId
+    });
+  }
+});
+
+app.get('/api/tools/wazuh/agents/:agentId/netproto', async (req, res) => {
+  try {
+    const { agentId } = req.params;
+    const netproto = await wazuhService.getAgentNetproto(agentId);
+    res.json({
+      status: 'ok',
+      data: netproto
+    });
+  } catch (error) {
+    console.error(`Error fetching netproto for agent ${req.params.agentId}: ${error.message}`);
+    res.status(error.message.includes('404') ? 404 : 500).json({
+      status: 'error',
+      message: error.message,
+      agentId: req.params.agentId
+    });
+  }
+});
+
+app.get('/api/tools/wazuh/agents/:agentId/syscheck', async (req, res) => {
+  try {
+    const { agentId } = req.params;
+    const syscheck = await wazuhService.getAgentSyscheck(agentId);
+    res.json({
+      status: 'ok',
+      data: syscheck
+    });
+  } catch (error) {
+    console.error(`Error fetching syscheck for agent ${req.params.agentId}: ${error.message}`);
+    res.status(error.message.includes('404') ? 404 : 500).json({
+      status: 'error',
+      message: error.message,
+      agentId: req.params.agentId
     });
   }
 });

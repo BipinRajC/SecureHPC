@@ -250,18 +250,18 @@ const ToolIntegrations: React.FC = () => {
                               View Dashboard
                             </button>
                           )}
-                          <button 
-                            className={`btn-primary py-1 px-3 text-sm w-24 ${scanningTool === tool.id ? 'opacity-70 cursor-not-allowed' : ''}`}
-                            onClick={() => handleRunTool(tool.id)}
-                            disabled={scanningTool === tool.id || loading.lynisRunning}
-                          >
-                            {scanningTool === tool.id ? (
-                              <>
-                                <Loader2 size={16} className="mr-1 animate-spin" />
-                                Running...
-                              </>
-                            ) : 'Run'}
-                          </button>
+                        <button 
+                          className={`btn-primary py-1 px-3 text-sm w-24 ${scanningTool === tool.id ? 'opacity-70 cursor-not-allowed' : ''}`}
+                          onClick={() => handleRunTool(tool.id)}
+                          disabled={scanningTool === tool.id || loading.lynisRunning}
+                        >
+                          {scanningTool === tool.id ? (
+                            <>
+                              <Loader2 size={16} className="mr-1 animate-spin" />
+                              Running...
+                            </>
+                          ) : 'Run'}
+                        </button>
                         </>
                       ) : (
                         <button 
