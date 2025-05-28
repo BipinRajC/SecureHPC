@@ -1,0 +1,3020 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wazuh Security Compliance Report - Agent 000</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            background: rgba(30, 41, 59, 0.5);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid #334155;
+        }
+        
+        .header h1 {
+            color: #60a5fa;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header .subtitle {
+            color: #94a3b8;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .report-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .meta-item {
+            background: rgba(51, 65, 85, 0.3);
+            padding: 0.75rem;
+            border-radius: 6px;
+            border-left: 3px solid #60a5fa;
+        }
+        
+        .section {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section h2 {
+            color: #60a5fa;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #334155;
+        }
+        
+        .section h3 {
+            color: #94a3b8;
+            font-size: 1.3rem;
+            margin: 1.5rem 0 1rem 0;
+        }
+        
+        .compliance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .compliance-card {
+            background: rgba(51, 65, 85, 0.5);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #475569;
+        }
+        
+        .compliance-card h4 {
+            color: #e2e8f0;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .chart-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            font-size: 0.9rem;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+        
+        .system-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .info-card {
+            background: rgba(51, 65, 85, 0.5);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid #475569;
+        }
+        
+        .info-card h4 {
+            color: #60a5fa;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .info-table th,
+        .info-table td {
+            padding: 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid #374151;
+        }
+        
+        .info-table th {
+            color: #9ca3af;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .info-table td {
+            color: #e5e7eb;
+            font-size: 0.9rem;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: rgba(17, 24, 39, 0.5);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .data-table th {
+            background: rgba(55, 65, 81, 0.8);
+            color: #9ca3af;
+            padding: 1rem 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .data-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #374151;
+            color: #d1d5db;
+            font-size: 0.85rem;
+        }
+        
+        .data-table tr:nth-child(even) {
+            background: rgba(31, 41, 55, 0.3);
+        }
+        
+        .data-table tr:hover {
+            background: rgba(55, 65, 81, 0.3);
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-active {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid #10b981;
+        }
+        
+        .status-inactive {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+        }
+        
+        .status-passed {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid #10b981;
+        }
+        
+        .status-failed {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+        }
+        
+        .status-na {
+            background: rgba(107, 114, 128, 0.2);
+            color: #6b7280;
+            border: 1px solid #6b7280;
+        }
+        
+        .severity-critical { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; }
+        .severity-high { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #dc2626; }
+        .severity-medium { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; }
+        .severity-low { background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid #3b82f6; }
+        
+        .truncate {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+        
+        .sca-rule {
+            background: rgba(17, 24, 39, 0.8);
+            border: 1px solid #374151;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        
+        .sca-rule-header {
+            padding: 1rem;
+            background: rgba(55, 65, 81, 0.3);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .sca-rule-header:hover {
+            background: rgba(55, 65, 81, 0.5);
+        }
+        
+        .sca-rule-content {
+            padding: 1rem;
+            border-top: 1px solid #374151;
+            display: none;
+        }
+        
+        .sca-rule.expanded .sca-rule-content {
+            display: block;
+        }
+        
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+        }
+        
+        .expanded .toggle-btn {
+            transform: rotate(90deg);
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 12px;
+            border: 1px solid #334155;
+            color: #64748b;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            
+            .section {
+                break-inside: avoid;
+                background: white;
+                border: 1px solid #ccc;
+            }
+        }
+    </style>
+    <script>
+        function toggleRule(id) {
+            const rule = document.getElementById('rule-' + id);
+            if (rule) {
+                rule.classList.toggle('expanded');
+            }
+        }
+        
+        function expandAll() {
+            const rules = document.querySelectorAll('.sca-rule');
+            rules.forEach(rule => rule.classList.add('expanded'));
+        }
+        
+        function collapseAll() {
+            const rules = document.querySelectorAll('.sca-rule');
+            rules.forEach(rule => rule.classList.remove('expanded'));
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🛡️ Wazuh Security Compliance Report</h1>
+            <div class="subtitle">Comprehensive Security Assessment and System Analysis</div>
+            <div class="report-meta">
+                <div class="meta-item">
+                    <strong>Agent:</strong> Agent 000 (ID: 000)
+                </div>
+                <div class="meta-item">
+                    <strong>Report Generated:</strong> 5/29/2025, 2:57:59 AM
+                </div>
+                <div class="meta-item">
+                    <strong>Agent Status:</strong> 
+                    <span class="status-badge status-inactive">
+                        unknown
+                    </span>
+                </div>
+                <div class="meta-item">
+                    <strong>IP Address:</strong> Unknown
+                </div>
+            </div>
+        </div>
+
+        <!-- Compliance Overview -->
+        <div class="section">
+            <h2>📊 Compliance Framework Status</h2>
+            <div class="compliance-grid">
+                
+                    <div class="compliance-card">
+                        <h4>PCI-DSS Compliance</h4>
+                        <div class="chart-container">
+                            
+        <svg width="200" height="200" viewBox="0 0 200 200">
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#374151" stroke-width="2"/>
+          <path d="M 100 100 L 100 20 A 80 80 0 1 1 21.46333440025161 115.23128873317351 Z" fill="#10b981" stroke="#fff" stroke-width="1"/>
+          <path d="M 100 100 L 21.46333440025161 115.23128873317351 A 80 80 0 0 1 70.09463425273849 25.799803911832427 Z" fill="#ef4444" stroke="#fff" stroke-width="1"/>
+          <path d="M 100 100 L 70.09463425273849 25.799803911832427 A 80 80 0 0 1 99.99999999999999 20 Z" fill="#6b7280" stroke="#fff" stroke-width="1"/>
+          <circle cx="100" cy="100" r="40" fill="#1f2937"/>
+          <text x="100" y="95" text-anchor="middle" fill="#fff" font-size="20" font-weight="bold">77%</text>
+          <text x="100" y="115" text-anchor="middle" fill="#9ca3af" font-size="12">Compliance</text>
+        </svg>
+      
+                        </div>
+                        <div class="legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #10b981;"></div>
+                                <span>Pass (59)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #ef4444;"></div>
+                                <span>Fail (18)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #6b7280;"></div>
+                                <span>N/A (5)</span>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="compliance-card">
+                        <h4>GDPR Compliance</h4>
+                        <div class="chart-container">
+                            
+        <svg width="200" height="200" viewBox="0 0 200 200">
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#374151" stroke-width="2"/>
+          <path d="M 100 100 L 100 20 A 80 80 0 1 1 46.55489086291733 159.52831518970885 Z" fill="#10b981" stroke="#fff" stroke-width="1"/>
+          <path d="M 100 100 L 46.55489086291733 159.52831518970885 A 80 80 0 0 1 20.16662713076863 105.16067595594534 Z" fill="#ef4444" stroke="#fff" stroke-width="1"/>
+          <path d="M 100 100 L 20.16662713076863 105.16067595594534 A 80 80 0 0 1 99.99999999999999 20 Z" fill="#6b7280" stroke="#fff" stroke-width="1"/>
+          <circle cx="100" cy="100" r="40" fill="#1f2937"/>
+          <text x="100" y="95" text-anchor="middle" fill="#fff" font-size="20" font-weight="bold">83%</text>
+          <text x="100" y="115" text-anchor="middle" fill="#9ca3af" font-size="12">Compliance</text>
+        </svg>
+      
+                        </div>
+                        <div class="legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #10b981;"></div>
+                                <span>Pass (45)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #ef4444;"></div>
+                                <span>Fail (9)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #6b7280;"></div>
+                                <span>N/A (19)</span>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="compliance-card">
+                        <h4>HIPAA Compliance</h4>
+                        <div class="chart-container">
+                            
+        <svg width="200" height="200" viewBox="0 0 200 200">
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#374151" stroke-width="2"/>
+          <path d="M 100 100 L 100 20 A 80 80 0 1 1 39.94621557978207 152.85397787120655 Z" fill="#10b981" stroke="#fff" stroke-width="1"/>
+          <path d="M 100 100 L 39.94621557978207 152.85397787120655 A 80 80 0 0 1 20.647965179289855 89.83857442024969 Z" fill="#ef4444" stroke="#fff" stroke-width="1"/>
+          <path d="M 100 100 L 20.647965179289855 89.83857442024969 A 80 80 0 0 1 99.99999999999999 20 Z" fill="#6b7280" stroke="#fff" stroke-width="1"/>
+          <circle cx="100" cy="100" r="40" fill="#1f2937"/>
+          <text x="100" y="95" text-anchor="middle" fill="#fff" font-size="20" font-weight="bold">82%</text>
+          <text x="100" y="115" text-anchor="middle" fill="#9ca3af" font-size="12">Compliance</text>
+        </svg>
+      
+                        </div>
+                        <div class="legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #10b981;"></div>
+                                <span>Pass (47)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #ef4444;"></div>
+                                <span>Fail (10)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #6b7280;"></div>
+                                <span>N/A (17)</span>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="compliance-card">
+                        <h4>NIST Compliance</h4>
+                        <div class="chart-container">
+                            
+        <svg width="200" height="200" viewBox="0 0 200 200">
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#374151" stroke-width="2"/>
+          <path d="M 100 100 L 100 20 A 80 80 0 1 1 23.915478696387723 124.72135954999584 Z" fill="#10b981" stroke="#fff" stroke-width="1"/>
+          <path d="M 100 100 L 23.915478696387723 124.72135954999584 A 80 80 0 0 1 52.977179816602074 35.27864045000426 Z" fill="#ef4444" stroke="#fff" stroke-width="1"/>
+          <path d="M 100 100 L 52.97717981660214 35.27864045000422 A 80 80 0 0 1 99.99999999999999 20 Z" fill="#6b7280" stroke="#fff" stroke-width="1"/>
+          <circle cx="100" cy="100" r="40" fill="#1f2937"/>
+          <text x="100" y="95" text-anchor="middle" fill="#fff" font-size="20" font-weight="bold">78%</text>
+          <text x="100" y="115" text-anchor="middle" fill="#9ca3af" font-size="12">Compliance</text>
+        </svg>
+      
+                        </div>
+                        <div class="legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #10b981;"></div>
+                                <span>Pass (56)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #ef4444;"></div>
+                                <span>Fail (16)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #6b7280;"></div>
+                                <span>N/A (8)</span>
+                            </div>
+                        </div>
+                    </div>
+                
+            </div>
+        </div>
+
+        <!-- System Information -->
+        <div class="section">
+            <h2>💻 System Information</h2>
+            <div class="system-info-grid">
+                <div class="info-card">
+                    <h4>🖥️ Operating System</h4>
+                    <table class="info-table">
+                        <tr><th>OS Name</th><td>Unknown</td></tr>
+                        <tr><th>Version</th><td>#25~24.04.1-Ubuntu SMP PREEMPT_DYNAMIC Tue Apr 15 17:20:50 UTC 2</td></tr>
+                        <tr><th>Architecture</th><td>x86_64</td></tr>
+                        <tr><th>Platform</th><td>Unknown</td></tr>
+                        <tr><th>Hostname</th><td>Agent 000</td></tr>
+                    </table>
+                </div>
+                
+                <div class="info-card">
+                    <h4>🔧 Hardware Information</h4>
+                    <table class="info-table">
+                        <tr><th>CPU Model</th><td>11th Gen Intel(R) Core(TM) i7-11370H @ 3.30GHz</td></tr>
+                        <tr><th>CPU Cores</th><td>3</td></tr>
+                        <tr><th>RAM Total</th><td>0.01 GB</td></tr>
+                        <tr><th>Board Serial</th><td class="truncate">0</td></tr>
+                    </table>
+                </div>
+                
+                <div class="info-card">
+                    <h4>🌐 Network Configuration</h4>
+                    <table class="info-table">
+                        <tr><th>Primary IP</th><td>Unknown</td></tr>
+                        <tr><th>MAC Address</th><td>Unknown</td></tr>
+                        <tr><th>Network Interfaces</th><td>2</td></tr>
+                        <tr><th>Open Ports</th><td>20</td></tr>
+                    </table>
+                </div>
+                
+                <div class="info-card">
+                    <h4>📦 System Metrics</h4>
+                    <table class="info-table">
+                        <tr><th>Running Processes</th><td>20+</td></tr>
+                        <tr><th>Installed Packages</th><td>20+</td></tr>
+                        <tr><th>Agent Version</th><td>Unknown</td></tr>
+                        <tr><th>Last Keep Alive</th><td>Unknown</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Network Interface Statistics -->
+        <div class="section">
+            <h2>🌐 Network Interface Statistics</h2>
+            
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Interface</th>
+                            <th>RX Packets</th>
+                            <th>TX Packets</th>
+                            <th>RX Bytes</th>
+                            <th>TX Bytes</th>
+                            <th>RX Dropped</th>
+                            <th>TX Dropped</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                            <tr>
+                                <td><strong>N/A</strong></td>
+                                <td>N/A</td>
+                                <td>N/A</td>
+                                <td>N/A</td>
+                                <td>N/A</td>
+                                <td>N/A</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                    </tbody>
+                </table>
+            
+        </div>
+
+        <!-- Network Protocol Information -->
+        <div class="section">
+            <h2>🔗 Network Protocol Information</h2>
+            
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Interface</th>
+                            <th>Type</th>
+                            <th>Gateway</th>
+                            <th>Destination</th>
+                            <th>Netmask</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                            <tr>
+                                <td><strong>enp0s3</strong></td>
+                                <td>ipv4</td>
+                                <td>10.108.204.1</td>
+                                <td>N/A</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>enp0s3</strong></td>
+                                <td>ipv6</td>
+                                <td>10.108.204.1</td>
+                                <td>N/A</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                    </tbody>
+                </table>
+            
+        </div>
+
+        <!-- SCA Configuration Assessment -->
+        
+        <div class="section">
+            <h2>🔍 Security Configuration Assessment (SCA)</h2>
+            <div style="margin-bottom: 1rem;">
+                <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                    <div class="status-badge status-passed">
+                        Passed: 100
+                    </div>
+                    <div class="status-badge status-failed">
+                        Failed: 145
+                    </div>
+                    <div class="status-badge status-na">
+                        N/A: 0
+                    </div>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button onclick="expandAll()" style="background: #374151; color: #d1d5db; border: 1px solid #4b5563; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Expand All</button>
+                    <button onclick="collapseAll()" style="background: #374151; color: #d1d5db; border: 1px solid #4b5563; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Collapse All</button>
+                </div>
+            </div>
+            
+            
+                <div class="sca-rule" id="rule-0">
+                    <div class="sca-rule-header" onclick="toggleRule(0)">
+                        <div style="display: flex; justify-content: between; align-items: center;">
+                            <div style="flex: 1;">
+                                <span class="toggle-btn">▶</span>
+                                <strong style="margin-left: 0.5rem;">Ensure mounting of cramfs filesystems is disabled.</strong>
+                                <span style="margin-left: 1rem;" class="status-badge severity-undefined">N/A</span>
+                                <span style="margin-left: 0.5rem;" class="status-badge status-failed">FAILED</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sca-rule-content">
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Description</h4>
+                            <p style="color: #d1d5db;">The cramfs filesystem type is a compressed read-only Linux filesystem embedded in small footprint systems. A cramfs image can be used without having to first decompress the image.</p>
+                        </div>
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Rationale</h4>
+                            <p style="color: #d1d5db;">Removing support for unneeded filesystem types reduces the local attack surface of the system. If this filesystem type is not needed, disable it.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #ef4444; margin-bottom: 0.5rem;">Remediation</h4>
+                            <p style="color: #d1d5db;">Run the following script to unload and disable the freevxfs module: - IF - the freevxfs kernel module is available in ANY installed kernel: - Create a file ending in .conf with install freevxfs /bin/false in the /etc/modprobe.d/ directory - Create a file ending in .conf with blacklist freevxfs in the /etc/modprobe.d/ directory - Run modprobe -r freevxfs 2>/dev/null; rmmod freevxfs 2>/dev/null to remove freevxfs from the kernel - IF - the freevxfs kernel module is not available on the system, or pre-compiled into the kernel, no remediation is necessary #!/usr/bin/env bash.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Compliance References</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.1.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 9.2
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 4.8
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CM.L2-3.4.7,CM.L2-3.4.8,SC.L2-3.13.6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: A.13.1.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: M1050
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: TA0005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: T1005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.6,1.2.1,2.2.2,2.2.5
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.2.5,2.2.4,6.4.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CC6.3,CC6.6
+                                    </span>
+                                
+                            </div>
+                        </div>
+                        
+                        
+                        
+                    </div>
+                </div>
+            
+                <div class="sca-rule" id="rule-1">
+                    <div class="sca-rule-header" onclick="toggleRule(1)">
+                        <div style="display: flex; justify-content: between; align-items: center;">
+                            <div style="flex: 1;">
+                                <span class="toggle-btn">▶</span>
+                                <strong style="margin-left: 0.5rem;">Ensure freevxfs kernel module is not available.</strong>
+                                <span style="margin-left: 1rem;" class="status-badge severity-undefined">N/A</span>
+                                <span style="margin-left: 0.5rem;" class="status-badge status-failed">FAILED</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sca-rule-content">
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Description</h4>
+                            <p style="color: #d1d5db;">The freevxfs filesystem type is a free version of the Veritas type filesystem. This is the primary filesystem type for HP-UX operating systems.</p>
+                        </div>
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Rationale</h4>
+                            <p style="color: #d1d5db;">Removing support for unneeded filesystem types reduces the local attack surface of the system. If this filesystem type is not needed, disable it.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #ef4444; margin-bottom: 0.5rem;">Remediation</h4>
+                            <p style="color: #d1d5db;">Run the following steps to unload and disable the freevxfs module, if available. If the freevxfs kernel module is present in any installed kernel Create a configuration file in the /etc/modprobe.d/ directory.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Compliance References</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.1.2
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 9.2
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 4.8
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CM.L2-3.4.7,CM.L2-3.4.8,SC.L2-3.13.6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: A.13.1.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: M1050
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: TA0005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: T1005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.6,1.2.1,2.2.2,2.2.5
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.2.5,2.2.4,6.4.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CC6.3,CC6.6
+                                    </span>
+                                
+                            </div>
+                        </div>
+                        
+                        
+                        
+                    </div>
+                </div>
+            
+                <div class="sca-rule" id="rule-2">
+                    <div class="sca-rule-header" onclick="toggleRule(2)">
+                        <div style="display: flex; justify-content: between; align-items: center;">
+                            <div style="flex: 1;">
+                                <span class="toggle-btn">▶</span>
+                                <strong style="margin-left: 0.5rem;">Ensure hfs kernel module is not available.</strong>
+                                <span style="margin-left: 1rem;" class="status-badge severity-undefined">N/A</span>
+                                <span style="margin-left: 0.5rem;" class="status-badge status-failed">FAILED</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sca-rule-content">
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Description</h4>
+                            <p style="color: #d1d5db;">The hfs filesystem type is a hierarchical filesystem that allows you to mount Mac OS filesystems.</p>
+                        </div>
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Rationale</h4>
+                            <p style="color: #d1d5db;">Removing support for unneeded filesystem types reduces the local attack surface of the system. If this filesystem type is not needed, disable it.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #ef4444; margin-bottom: 0.5rem;">Remediation</h4>
+                            <p style="color: #d1d5db;">Run the following script to unload and disable the hfs module: - IF - the hfs kernel module is available in ANY installed kernel: - Create a file ending in .conf with install hfs /bin/false in the /etc/modprobe.d/ directory - Create a file ending in .conf with blacklist hfs in the /etc/modprobe.d/ directory - Run modprobe -r hfs 2>/dev/null; rmmod hfs 2>/dev/null to remove hfs from the kernel.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Compliance References</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.1.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 9.2
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 4.8
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CM.L2-3.4.7,CM.L2-3.4.8,SC.L2-3.13.6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: A.13.1.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: M1050
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: TA0005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: T1005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.6,1.2.1,2.2.2,2.2.5
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.2.5,2.2.4,6.4.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CC6.3,CC6.6
+                                    </span>
+                                
+                            </div>
+                        </div>
+                        
+                        
+                        
+                    </div>
+                </div>
+            
+                <div class="sca-rule" id="rule-3">
+                    <div class="sca-rule-header" onclick="toggleRule(3)">
+                        <div style="display: flex; justify-content: between; align-items: center;">
+                            <div style="flex: 1;">
+                                <span class="toggle-btn">▶</span>
+                                <strong style="margin-left: 0.5rem;">Ensure hfsplus kernel module is not available.</strong>
+                                <span style="margin-left: 1rem;" class="status-badge severity-undefined">N/A</span>
+                                <span style="margin-left: 0.5rem;" class="status-badge status-failed">FAILED</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sca-rule-content">
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Description</h4>
+                            <p style="color: #d1d5db;">The hfsplus filesystem type is a hierarchical filesystem designed to replace hfs that allows you to mount Mac OS filesystems.</p>
+                        </div>
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Rationale</h4>
+                            <p style="color: #d1d5db;">Removing support for unneeded filesystem types reduces the local attack surface of the system. If this filesystem type is not needed, disable it.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #ef4444; margin-bottom: 0.5rem;">Remediation</h4>
+                            <p style="color: #d1d5db;">Run the following script to unload and disable the hfsplus module: - IF - the hfsplus kernel module is available in ANY installed kernel: - Create a file ending in .conf with install hfsplus /bin/false in the /etc/modprobe.d/ directory - Create a file ending in .conf with blacklist hfsplus in the /etc/modprobe.d/ directory.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Compliance References</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.1.4
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 9.2
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 4.8
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CM.L2-3.4.7,CM.L2-3.4.8,SC.L2-3.13.6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: A.13.1.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: M1050
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: TA0005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: T1005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.6,1.2.1,2.2.2,2.2.5
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.2.5,2.2.4,6.4.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CC6.3,CC6.6
+                                    </span>
+                                
+                            </div>
+                        </div>
+                        
+                        
+                        
+                    </div>
+                </div>
+            
+                <div class="sca-rule" id="rule-4">
+                    <div class="sca-rule-header" onclick="toggleRule(4)">
+                        <div style="display: flex; justify-content: between; align-items: center;">
+                            <div style="flex: 1;">
+                                <span class="toggle-btn">▶</span>
+                                <strong style="margin-left: 0.5rem;">Ensure jffs2 kernel module is not available.</strong>
+                                <span style="margin-left: 1rem;" class="status-badge severity-undefined">N/A</span>
+                                <span style="margin-left: 0.5rem;" class="status-badge status-failed">FAILED</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sca-rule-content">
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Description</h4>
+                            <p style="color: #d1d5db;">The jffs2 (journaling flash filesystem 2) filesystem type is a log-structured filesystem used in flash memory devices.</p>
+                        </div>
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Rationale</h4>
+                            <p style="color: #d1d5db;">Removing support for unneeded filesystem types reduces the local attack surface of the system. If this filesystem type is not needed, disable it.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #ef4444; margin-bottom: 0.5rem;">Remediation</h4>
+                            <p style="color: #d1d5db;">Run the following script to unload and disable the jffs2 module: - IF - the jffs2 kernel module is available in ANY installed kernel: - Create a file ending in .conf with install jffs2 /bin/false in the /etc/modprobe.d/ directory - Create a file ending in .conf with blacklist jffs2 in the /etc/modprobe.d/ directory - Run modprobe -r jffs2 2>/dev/null; rmmod jffs2 2>/dev/null to remove jffs2 from the kernel - IF - the jffs2 kernel module is not available on the system, or pre-compiled into the kernel, no remediation is necessary.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Compliance References</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.1.5
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 9.2
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 4.8
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CM.L2-3.4.7,CM.L2-3.4.8,SC.L2-3.13.6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: A.13.1.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: M1050
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: TA0005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: T1005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.6,1.2.1,2.2.2,2.2.5
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.2.5,2.2.4,6.4.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CC6.3,CC6.6
+                                    </span>
+                                
+                            </div>
+                        </div>
+                        
+                        
+                        
+                    </div>
+                </div>
+            
+                <div class="sca-rule" id="rule-5">
+                    <div class="sca-rule-header" onclick="toggleRule(5)">
+                        <div style="display: flex; justify-content: between; align-items: center;">
+                            <div style="flex: 1;">
+                                <span class="toggle-btn">▶</span>
+                                <strong style="margin-left: 0.5rem;">Ensure overlayfs kernel module is not available.</strong>
+                                <span style="margin-left: 1rem;" class="status-badge severity-undefined">N/A</span>
+                                <span style="margin-left: 0.5rem;" class="status-badge status-failed">FAILED</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sca-rule-content">
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Description</h4>
+                            <p style="color: #d1d5db;">overlayfs is a Linux filesystem that layers multiple filesystems to create a single unified view which allows a user to "merge" several mount points into a unified filesystem.</p>
+                        </div>
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Rationale</h4>
+                            <p style="color: #d1d5db;">The overlayfs has known CVE's: CVE-2023-32629, CVE-2023-2640, CVE-2023-0386. Disabling the overlayfs reduces the local attack surface by removing support for unnecessary filesystem types and mitigates potential risks associated with unauthorized execution of setuid files, enhancing the overall system security.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #ef4444; margin-bottom: 0.5rem;">Remediation</h4>
+                            <p style="color: #d1d5db;">Run the following script to unload and disable the overlayfs module: - IF - the overlayfs kernel module is available in ANY installed kernel: - Create a file ending in .conf with install overlayfs /bin/false in the /etc/modprobe.d/ directory - Create a file ending in .conf with blacklist overlayfs in the /etc/modprobe.d/ directory - Run modprobe -r overlayfs 2>/dev/null; rmmod overlayfs 2>/dev/null to remove overlayfs from the kernel - IF - the overlayfs kernel module is not available on the system, or pre-compiled into the kernel, no remediation is necessary #!/usr/bin/env bash.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Compliance References</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.1.6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 9.2
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 4.8
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CM.L2-3.4.7,CM.L2-3.4.8,SC.L2-3.13.6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: A.13.1.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: M1050
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: TA0005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: T1005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.6,1.2.1,2.2.2,2.2.5
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.2.5,2.2.4,6.4.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CC6.3,CC6.6
+                                    </span>
+                                
+                            </div>
+                        </div>
+                        
+                        
+                        
+                    </div>
+                </div>
+            
+                <div class="sca-rule" id="rule-6">
+                    <div class="sca-rule-header" onclick="toggleRule(6)">
+                        <div style="display: flex; justify-content: between; align-items: center;">
+                            <div style="flex: 1;">
+                                <span class="toggle-btn">▶</span>
+                                <strong style="margin-left: 0.5rem;">Ensure squashfs kernel module is not available.</strong>
+                                <span style="margin-left: 1rem;" class="status-badge severity-undefined">N/A</span>
+                                <span style="margin-left: 0.5rem;" class="status-badge status-failed">FAILED</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sca-rule-content">
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Description</h4>
+                            <p style="color: #d1d5db;">The squashfs filesystem type is a compressed read-only Linux filesystem embedded in small footprint systems. A squashfs image can be used without having to first decompress the image.</p>
+                        </div>
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Rationale</h4>
+                            <p style="color: #d1d5db;">Removing support for unneeded filesystem types reduces the local attack surface of the system. If this filesystem type is not needed, disable it.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #ef4444; margin-bottom: 0.5rem;">Remediation</h4>
+                            <p style="color: #d1d5db;">Run the following script to unload and disable the udf module: - IF - the squashfs kernel module is available in ANY installed kernel: - Create a file ending in .conf with install squashfs /bin/false in the /etc/modprobe.d/ directory - Create a file ending in .conf with blacklist squashfs in the /etc/modprobe.d/ directory - Run modprobe -r squashfs 2>/dev/null; rmmod squashfs 2>/dev/null to remove squashfs from the kernel - IF - the squashfs kernel module is not available on the system, or pre-compiled into the kernel, no remediation is necessary.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Compliance References</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.1.7
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 9.2
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 4.8
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CM.L2-3.4.7,CM.L2-3.4.8,SC.L2-3.13.6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: A.13.1.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: M1050
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: TA0005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: T1005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.6,1.2.1,2.2.2,2.2.5
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.2.5,2.2.4,6.4.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CC6.3,CC6.6
+                                    </span>
+                                
+                            </div>
+                        </div>
+                        
+                        
+                        
+                    </div>
+                </div>
+            
+                <div class="sca-rule" id="rule-7">
+                    <div class="sca-rule-header" onclick="toggleRule(7)">
+                        <div style="display: flex; justify-content: between; align-items: center;">
+                            <div style="flex: 1;">
+                                <span class="toggle-btn">▶</span>
+                                <strong style="margin-left: 0.5rem;">Ensure udf kernel module is not available.</strong>
+                                <span style="margin-left: 1rem;" class="status-badge severity-undefined">N/A</span>
+                                <span style="margin-left: 0.5rem;" class="status-badge status-failed">FAILED</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sca-rule-content">
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Description</h4>
+                            <p style="color: #d1d5db;">The udf filesystem type is the universal disk format used to implement ISO/IEC 13346 and ECMA-167 specifications. This is an open vendor filesystem type for data storage on a broad range of media. This filesystem type is necessary to support writing DVDs and newer optical disc formats.</p>
+                        </div>
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Rationale</h4>
+                            <p style="color: #d1d5db;">Removing support for unneeded filesystem types reduces the local attack surface of the system. If this filesystem type is not needed, disable it.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #ef4444; margin-bottom: 0.5rem;">Remediation</h4>
+                            <p style="color: #d1d5db;">Run the following script to unload and disable the udf module: - IF - the udf kernel module is available in ANY installed kernel: - Create a file ending in .conf with install udf /bin/false in the /etc/modprobe.d/ directory - Create a file ending in .conf with blacklist udf in the /etc/modprobe.d/ directory - Run modprobe -r udf 2>/dev/null; rmmod udf 2>/dev/null to remove udf from the kernel - IF - the udf kernel module is not available on the system, or pre-compiled into the kernel, no remediation is necessary.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Compliance References</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.1.8
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 9.2
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 4.8
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CM.L2-3.4.7,CM.L2-3.4.8,SC.L2-3.13.6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: A.13.1.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: M1050
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: TA0005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: T1005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.6,1.2.1,2.2.2,2.2.5
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.2.5,2.2.4,6.4.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CC6.3,CC6.6
+                                    </span>
+                                
+                            </div>
+                        </div>
+                        
+                        
+                        
+                    </div>
+                </div>
+            
+                <div class="sca-rule" id="rule-8">
+                    <div class="sca-rule-header" onclick="toggleRule(8)">
+                        <div style="display: flex; justify-content: between; align-items: center;">
+                            <div style="flex: 1;">
+                                <span class="toggle-btn">▶</span>
+                                <strong style="margin-left: 0.5rem;">Ensure usb-storage kernel module is not available.</strong>
+                                <span style="margin-left: 1rem;" class="status-badge severity-undefined">N/A</span>
+                                <span style="margin-left: 0.5rem;" class="status-badge status-failed">FAILED</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sca-rule-content">
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Description</h4>
+                            <p style="color: #d1d5db;">USB storage provides a means to transfer and store files ensuring persistence and availability of the files independent of network connection status. Its popularity and utility has led to USB-based malware being a simple and common means for network infiltration and a first step to establishing a persistent threat within a networked environment.</p>
+                        </div>
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Rationale</h4>
+                            <p style="color: #d1d5db;">Restricting USB access on the system will decrease the physical attack surface for a device and diminish the possible vectors to introduce malware.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #ef4444; margin-bottom: 0.5rem;">Remediation</h4>
+                            <p style="color: #d1d5db;">Run the following script to unload and disable the usb-storage module: - IF - the usb-storage kernel module is available in ANY installed kernel: - Create a file ending in .conf with install usb-storage /bin/false in the /etc/modprobe.d/ directory - Create a file ending in .conf with blacklist usb-storage in the /etc/modprobe.d/ directory - Run modprobe -r usb-storage 2>/dev/null; rmmod usb-storage 2>/dev/null to remove usb-storage from the kernel - IF - the usb-storage kernel module is not available on the system, or pre-compiled into the kernel, no remediation is necessary.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Compliance References</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.1.9
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 13.7
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 10.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: MP.L2-3.8.7
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 164.310(d)(1)
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: A.8.3.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: M1034
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: TA0001,TA0010
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: T1052,T1052.001,T1091,T1200
+                                    </span>
+                                
+                            </div>
+                        </div>
+                        
+                        
+                        
+                    </div>
+                </div>
+            
+                <div class="sca-rule" id="rule-9">
+                    <div class="sca-rule-header" onclick="toggleRule(9)">
+                        <div style="display: flex; justify-content: between; align-items: center;">
+                            <div style="flex: 1;">
+                                <span class="toggle-btn">▶</span>
+                                <strong style="margin-left: 0.5rem;">Ensure unused filesystems kernel modules are not available.</strong>
+                                <span style="margin-left: 1rem;" class="status-badge severity-undefined">N/A</span>
+                                <span style="margin-left: 0.5rem;" class="status-badge status-failed">FAILED</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sca-rule-content">
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Description</h4>
+                            <p style="color: #d1d5db;">Filesystem kernel modules are pieces of code that can be dynamically loaded into the Linux kernel to extend its filesystem capabilities, or so-called base kernel, of an operating system. Filesystem kernel modules are typically used to add support for new hardware (as device drivers), or for adding system calls.</p>
+                        </div>
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Rationale</h4>
+                            <p style="color: #d1d5db;">While loadable filesystem kernel modules are a convenient method of modifying the running kernel, this can be abused by attackers on a compromised system to prevent detection of their processes or files, allowing them to maintain control over the system. Many rootkits make use of loadable filesystem kernel modules in this way. Removing support for unneeded filesystem types reduces the local attack surface of the system. If this filesystem type is not needed, disable it. The following filesystem kernel modules have known CVE's and should be made unavailable if no dependencies exist: - afs - CVE-2022-37402 - ceph - CVE-2022-0670 - cifs - CVE-2022-29869 - exfat CVE-2022-29973 - ext CVE-2022-1184 - fat CVE-2022-22043 - fscache CVE-2022-3630 - fuse CVE-2023-0386 - gfs2 CVE-2023-3212 - nfs_common CVE-2023-6660 - nfsd CVE-2022-43945 - smbfs_common CVE-2022-2585.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #ef4444; margin-bottom: 0.5rem;">Remediation</h4>
+                            <p style="color: #d1d5db;">- IF - the module is available in the running kernel: - Unload the filesystem kernel module from the kernel - Create a file ending in .conf with install filesystem kernel modules /bin/false in the /etc/modprobe.d/ directory - Create a file ending in .conf with deny list filesystem kernel modules in the /etc/modprobe.d/ directory WARNING: unloading, disabling or denylisting filesystem modules that are in use on the system maybe FATAL. It is extremely important to thoroughly review the filesystems returned by the audit before following the remediation procedure. Example of unloading the gfs2kernel module: # modprobe -r gfs2 2>/dev/null # rmmod gfs2 2>/dev/null Example of fully disabling the gfs2 kernel module.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Compliance References</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.1.10
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 9.2
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 4.8
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CM.L2-3.4.7,CM.L2-3.4.8,SC.L2-3.13.6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: A.13.1.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.6,1.2.1,2.2.2,2.2.5
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.2.5,2.2.4,6.4.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CC6.3,CC6.6
+                                    </span>
+                                
+                            </div>
+                        </div>
+                        
+                        
+                        
+                    </div>
+                </div>
+            
+                <div class="sca-rule" id="rule-10">
+                    <div class="sca-rule-header" onclick="toggleRule(10)">
+                        <div style="display: flex; justify-content: between; align-items: center;">
+                            <div style="flex: 1;">
+                                <span class="toggle-btn">▶</span>
+                                <strong style="margin-left: 0.5rem;">Ensure /tmp is a separate partition.</strong>
+                                <span style="margin-left: 1rem;" class="status-badge severity-undefined">N/A</span>
+                                <span style="margin-left: 0.5rem;" class="status-badge status-failed">FAILED</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sca-rule-content">
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Description</h4>
+                            <p style="color: #d1d5db;">The /tmp directory is a world-writable directory used for temporary storage by all users and some applications. - IF - an entry for /tmp exists in /etc/fstab it will take precedence over entries in systemd default unit file. Note: In an environment where the main system is diskless and connected to iSCSI, entries in /etc/fstab may not take precedence. /tmp can be configured to use tmpfs. tmpfs puts everything into the kernel internal caches and grows and shrinks to accommodate the files it contains and is able to swap unneeded pages out to swap space. It has maximum size limits which can be adjusted on the fly via mount -o remount. Since tmpfs lives completely in the page cache and on swap, all tmpfs pages will be shown as "Shmem" in /proc/meminfo and "Shared" in free. Notice that these counters also include shared memory. The most reliable way to get the count is using df and du. tmpfs has three mount options for sizing: - size: The limit of allocated bytes for this tmpfs instance. The default is half of your physical RAM without swap. If you oversize your tmpfs instances the machine will deadlock since the OOM handler will not be able to free that memory. - nr_blocks: The same as size, but in blocks of PAGE_SIZE. - nr_inodes: The maximum number of inodes for this instance. The default is half of the number of your physical RAM pages, or (on a machine with highmem) the number of lowmem RAM pages, whichever is the lower. These parameters accept a suffix k, m or g and can be changed on remount. The size parameter also accepts a suffix % to limit this tmpfs instance to that percentage of your physical RAM. The default, when neither size nor nr_blocks is specified, is size=50%.</p>
+                        </div>
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Rationale</h4>
+                            <p style="color: #d1d5db;">Making /tmp its own file system allows an administrator to set additional mount options such as the noexec option on the mount, making /tmp useless for an attacker to install executable code. It would also prevent an attacker from establishing a hard link to a system setuid program and wait for it to be updated. Once the program was updated, the hard link would be broken, and the attacker would have his own copy of the program. If the program happened to have a security vulnerability, the attacker could continue to exploit the known flaw. This can be accomplished by either mounting tmpfs to /tmp, or creating a separate partition for /tmp.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #ef4444; margin-bottom: 0.5rem;">Remediation</h4>
+                            <p style="color: #d1d5db;">First ensure that systemd is correctly configured to ensure that /tmp will be mounted at boot time. # systemctl unmask tmp.mount For specific configuration requirements of the /tmp mount for your environment, modify /etc/fstab. Example of using tmpfs with specific mount options: tmpfs /tmp 0 tmpfs defaults,rw,nosuid,nodev,noexec,relatime,size=2G 0 Note: the size=2G is an example of setting a specific size for tmpfs. Example of using a volume or disk with specific mount options. The source location of the volume or disk will vary depending on your environment: <device> /tmp <fstype> defaults,nodev,nosuid,noexec 0 0.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Compliance References</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.2.1.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 9.2
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 4.8
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CM.L2-3.4.7,CM.L2-3.4.8,SC.L2-3.13.6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: A.13.1.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: M1022
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: TA0005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: T1499,T1499.001
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.6,1.2.1,2.2.2,2.2.5
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.2.5,2.2.4,6.4.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CC6.3,CC6.6
+                                    </span>
+                                
+                            </div>
+                        </div>
+                        
+                        
+                        
+                    </div>
+                </div>
+            
+                <div class="sca-rule" id="rule-11">
+                    <div class="sca-rule-header" onclick="toggleRule(11)">
+                        <div style="display: flex; justify-content: between; align-items: center;">
+                            <div style="flex: 1;">
+                                <span class="toggle-btn">▶</span>
+                                <strong style="margin-left: 0.5rem;">Ensure nodev option set on /tmp partition.</strong>
+                                <span style="margin-left: 1rem;" class="status-badge severity-undefined">N/A</span>
+                                <span style="margin-left: 0.5rem;" class="status-badge status-failed">FAILED</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sca-rule-content">
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Description</h4>
+                            <p style="color: #d1d5db;">The nodev mount option specifies that the filesystem cannot contain special devices.</p>
+                        </div>
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Rationale</h4>
+                            <p style="color: #d1d5db;">Since the /tmp filesystem is not intended to support devices, set this option to ensure that users cannot create a block or character special devices in /tmp.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #ef4444; margin-bottom: 0.5rem;">Remediation</h4>
+                            <p style="color: #d1d5db;">- IF - a separate partition exists for /tmp. Edit the /etc/fstab file and add nodev to the fourth field (mounting options) for the /tmp partition. Example: <device> /tmp <fstype> defaults,rw,nosuid,nodev,noexec,relatime 0 0 Run the following command to remount /tmp with the configured options: # mount -o remount /tmp.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Compliance References</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.2.1.2
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 9.2
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 4.8
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CM.L2-3.4.7,CM.L2-3.4.8,SC.L2-3.13.6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: A.13.1.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: M1022
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: TA0005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: T1200
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.6,1.2.1,2.2.2,2.2.5
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.2.5,2.2.4,6.4.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CC6.3,CC6.6
+                                    </span>
+                                
+                            </div>
+                        </div>
+                        
+                        
+                        
+                    </div>
+                </div>
+            
+                <div class="sca-rule" id="rule-12">
+                    <div class="sca-rule-header" onclick="toggleRule(12)">
+                        <div style="display: flex; justify-content: between; align-items: center;">
+                            <div style="flex: 1;">
+                                <span class="toggle-btn">▶</span>
+                                <strong style="margin-left: 0.5rem;">Ensure nosuid option set on /tmp partition.</strong>
+                                <span style="margin-left: 1rem;" class="status-badge severity-undefined">N/A</span>
+                                <span style="margin-left: 0.5rem;" class="status-badge status-failed">FAILED</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sca-rule-content">
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Description</h4>
+                            <p style="color: #d1d5db;">The nosuid mount option specifies that the filesystem cannot contain setuid files.</p>
+                        </div>
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Rationale</h4>
+                            <p style="color: #d1d5db;">Since the /tmp filesystem is only intended for temporary file storage, set this option to ensure that users cannot create setuid files in /tmp.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #ef4444; margin-bottom: 0.5rem;">Remediation</h4>
+                            <p style="color: #d1d5db;">- IF - a separate partition exists for /tmp. Edit the /etc/fstab file and add nosuid to the fourth field (mounting options) for the /tmp partition. Example: <device> /tmp <fstype> defaults,rw,nosuid,nodev,noexec,relatime 0 0 Run the following command to remount /tmp with the configured options: # mount -o remount /tmp.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Compliance References</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.2.1.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 14.6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 3.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: AC.L1-3.1.1,AC.L1-3.1.2,AC.L2-3.1.3,AC.L2-3.1.5,MP.L2-3.8.2
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 164.308(a)(3)(i),164.308(a)(3)(ii)(A),164.312(a)(1)
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: A.9.1.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: M1022
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: TA0005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: T1548,T1548.001
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: AC-5,AC-6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 7.1,7.1.1,7.1.2,7.1.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.3.1,7.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CC5.2,CC6.1
+                                    </span>
+                                
+                            </div>
+                        </div>
+                        
+                        
+                        
+                    </div>
+                </div>
+            
+                <div class="sca-rule" id="rule-13">
+                    <div class="sca-rule-header" onclick="toggleRule(13)">
+                        <div style="display: flex; justify-content: between; align-items: center;">
+                            <div style="flex: 1;">
+                                <span class="toggle-btn">▶</span>
+                                <strong style="margin-left: 0.5rem;">Ensure noexec option set on /tmp partition.</strong>
+                                <span style="margin-left: 1rem;" class="status-badge severity-undefined">N/A</span>
+                                <span style="margin-left: 0.5rem;" class="status-badge status-failed">FAILED</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sca-rule-content">
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Description</h4>
+                            <p style="color: #d1d5db;">The noexec mount option specifies that the filesystem cannot contain executable binaries.</p>
+                        </div>
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Rationale</h4>
+                            <p style="color: #d1d5db;">Since the /tmp filesystem is only intended for temporary file storage, set this option to ensure that users cannot run executable binaries from /tmp.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #ef4444; margin-bottom: 0.5rem;">Remediation</h4>
+                            <p style="color: #d1d5db;">- IF - a separate partition exists for /tmp. Edit the /etc/fstab file and add noexec to the fourth field (mounting options) for the /tmp partition. Example: <device> /tmp <fstype> defaults,rw,nosuid,nodev,noexec,relatime 0 0 Run the following command to remount /tmp with the configured options: # mount -o remount /tmp.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Compliance References</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.2.1.4
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 14.6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 3.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: AC.L1-3.1.1,AC.L1-3.1.2,AC.L2-3.1.3,AC.L2-3.1.5,MP.L2-3.8.2
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 164.308(a)(3)(i),164.308(a)(3)(ii)(A),164.312(a)(1)
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: A.9.1.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: M1022
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: TA0005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: T1204,T1204.002
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: AC-5,AC-6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 7.1,7.1.1,7.1.2,7.1.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.3.1,7.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CC5.2,CC6.1
+                                    </span>
+                                
+                            </div>
+                        </div>
+                        
+                        
+                        
+                    </div>
+                </div>
+            
+                <div class="sca-rule" id="rule-14">
+                    <div class="sca-rule-header" onclick="toggleRule(14)">
+                        <div style="display: flex; justify-content: between; align-items: center;">
+                            <div style="flex: 1;">
+                                <span class="toggle-btn">▶</span>
+                                <strong style="margin-left: 0.5rem;">Ensure /dev/shm is a separate partition.</strong>
+                                <span style="margin-left: 1rem;" class="status-badge severity-undefined">N/A</span>
+                                <span style="margin-left: 0.5rem;" class="status-badge status-passed">PASSED</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sca-rule-content">
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Description</h4>
+                            <p style="color: #d1d5db;">The /dev/shm directory is a world-writable directory that can function as shared memory that facilitates inter process communication (IPC).</p>
+                        </div>
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Rationale</h4>
+                            <p style="color: #d1d5db;">Making /dev/shm its own file system allows an administrator to set additional mount options such as the noexec option on the mount, making /dev/shm useless for an attacker to install executable code. It would also prevent an attacker from establishing a hard link to a system setuid program and wait for it to be updated. Once the program was updated, the hard link would be broken and the attacker would have his own copy of the program. If the program happened to have a security vulnerability, the attacker could continue to exploit the known flaw. This can be accomplished by mounting tmpfs to /dev/shm.</p>
+                        </div>
+                        
+                        
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Compliance References</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.2.2.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 9.2
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 4.8
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CM.L2-3.4.7,CM.L2-3.4.8,SC.L2-3.13.6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: A.13.1.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: M1022
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: TA0005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: T1499,T1499.001
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.6,1.2.1,2.2.2,2.2.5
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.2.5,2.2.4,6.4.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CC6.3,CC6.6
+                                    </span>
+                                
+                            </div>
+                        </div>
+                        
+                        
+                        
+                    </div>
+                </div>
+            
+                <div class="sca-rule" id="rule-15">
+                    <div class="sca-rule-header" onclick="toggleRule(15)">
+                        <div style="display: flex; justify-content: between; align-items: center;">
+                            <div style="flex: 1;">
+                                <span class="toggle-btn">▶</span>
+                                <strong style="margin-left: 0.5rem;">Ensure nodev option set on /dev/shm partition.</strong>
+                                <span style="margin-left: 1rem;" class="status-badge severity-undefined">N/A</span>
+                                <span style="margin-left: 0.5rem;" class="status-badge status-passed">PASSED</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sca-rule-content">
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Description</h4>
+                            <p style="color: #d1d5db;">The nodev mount option specifies that the filesystem cannot contain special devices.</p>
+                        </div>
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Rationale</h4>
+                            <p style="color: #d1d5db;">Since the /dev/shm filesystem is not intended to support devices, set this option to ensure that users cannot attempt to create special devices in /dev/shm partitions.</p>
+                        </div>
+                        
+                        
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Compliance References</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.2.2.2
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 14.6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 3.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: AC.L1-3.1.1,AC.L1-3.1.2,AC.L2-3.1.3,AC.L2-3.1.5,MP.L2-3.8.2
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 164.308(a)(3)(i),164.308(a)(3)(ii)(A),164.312(a)(1)
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: A.9.1.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: M1022
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: TA0005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: T1200
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: AC-5,AC-6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 7.1,7.1.1,7.1.2,7.1.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.3.1,7.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CC5.2,CC6.1
+                                    </span>
+                                
+                            </div>
+                        </div>
+                        
+                        
+                        
+                    </div>
+                </div>
+            
+                <div class="sca-rule" id="rule-16">
+                    <div class="sca-rule-header" onclick="toggleRule(16)">
+                        <div style="display: flex; justify-content: between; align-items: center;">
+                            <div style="flex: 1;">
+                                <span class="toggle-btn">▶</span>
+                                <strong style="margin-left: 0.5rem;">Ensure nosuid option set on /dev/shm partition.</strong>
+                                <span style="margin-left: 1rem;" class="status-badge severity-undefined">N/A</span>
+                                <span style="margin-left: 0.5rem;" class="status-badge status-passed">PASSED</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sca-rule-content">
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Description</h4>
+                            <p style="color: #d1d5db;">The nosuid mount option specifies that the filesystem cannot contain setuid files.</p>
+                        </div>
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Rationale</h4>
+                            <p style="color: #d1d5db;">Setting this option on a file system prevents users from introducing privileged programs onto the system and allowing non-root users to execute them.</p>
+                        </div>
+                        
+                        
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Compliance References</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.2.2.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 14.6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 3.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: AC.L1-3.1.1,AC.L1-3.1.2,AC.L2-3.1.3,AC.L2-3.1.5,MP.L2-3.8.2
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 164.308(a)(3)(i),164.308(a)(3)(ii)(A),164.312(a)(1)
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: A.9.1.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: M1038
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: TA0005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: T1548,T1548.001
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: AC-5,AC-6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 7.1,7.1.1,7.1.2,7.1.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.3.1,7.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CC5.2,CC6.1
+                                    </span>
+                                
+                            </div>
+                        </div>
+                        
+                        
+                        
+                    </div>
+                </div>
+            
+                <div class="sca-rule" id="rule-17">
+                    <div class="sca-rule-header" onclick="toggleRule(17)">
+                        <div style="display: flex; justify-content: between; align-items: center;">
+                            <div style="flex: 1;">
+                                <span class="toggle-btn">▶</span>
+                                <strong style="margin-left: 0.5rem;">Ensure noexec option set on /dev/shm partition.</strong>
+                                <span style="margin-left: 1rem;" class="status-badge severity-undefined">N/A</span>
+                                <span style="margin-left: 0.5rem;" class="status-badge status-failed">FAILED</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sca-rule-content">
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Description</h4>
+                            <p style="color: #d1d5db;">The noexec mount option specifies that the filesystem cannot contain executable binaries.</p>
+                        </div>
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Rationale</h4>
+                            <p style="color: #d1d5db;">Setting this option on a file system prevents users from executing programs from shared memory. This deters users from introducing potentially malicious software on the system.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #ef4444; margin-bottom: 0.5rem;">Remediation</h4>
+                            <p style="color: #d1d5db;">- IF - a separate partition exists for /dev/shm. Edit the /etc/fstab file and add noexec to the fourth field (mounting options) for the /dev/shm partition. Example: tmpfs /dev/shm tmpfs defaults,rw,nosuid,nodev,noexec,relatime 0 0 Run the following command to remount /dev/shm with the configured options: # mount -o remount /dev/shm Note: It is recommended to use tmpfs as the device/filesystem type as /dev/shm is used as shared memory space by applications.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Compliance References</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.2.2.4
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 14.6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 3.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: AC.L1-3.1.1,AC.L1-3.1.2,AC.L2-3.1.3,AC.L2-3.1.5,MP.L2-3.8.2
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 164.308(a)(3)(i),164.308(a)(3)(ii)(A),164.312(a)(1)
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: A.9.1.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: M1022
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: TA0005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: T1204,T1204.002
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: AC-5,AC-6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 7.1,7.1.1,7.1.2,7.1.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.3.1,7.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CC5.2,CC6.1
+                                    </span>
+                                
+                            </div>
+                        </div>
+                        
+                        
+                        
+                    </div>
+                </div>
+            
+                <div class="sca-rule" id="rule-18">
+                    <div class="sca-rule-header" onclick="toggleRule(18)">
+                        <div style="display: flex; justify-content: between; align-items: center;">
+                            <div style="flex: 1;">
+                                <span class="toggle-btn">▶</span>
+                                <strong style="margin-left: 0.5rem;">Ensure separate partition exists for /home.</strong>
+                                <span style="margin-left: 1rem;" class="status-badge severity-undefined">N/A</span>
+                                <span style="margin-left: 0.5rem;" class="status-badge status-failed">FAILED</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sca-rule-content">
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Description</h4>
+                            <p style="color: #d1d5db;">The /home directory is used to support disk storage needs of local users.</p>
+                        </div>
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Rationale</h4>
+                            <p style="color: #d1d5db;">The default installation only creates a single / partition. Since the /home directory contains user generated data, there is a risk of resource exhaustion. It will essentially have the whole disk available to fill up and impact the system as a whole. In addition, other operations on the system could fill up the disk unrelated to /home and impact all local users. Configuring /home as its own file system allows an administrator to set additional mount options such as noexec/nosuid/nodev. These options limit an attacker's ability to create exploits on the system. In the case of /home options such as usrquota/grpquota may be considered to limit the impact that users can have on each other with regards to disk resource exhaustion. Other options allow for specific behavior. See man mount for exact details regarding filesystem-independent and filesystem-specific options. As /home contains user data, care should be taken to ensure the security and integrity of the data and mount point.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #ef4444; margin-bottom: 0.5rem;">Remediation</h4>
+                            <p style="color: #d1d5db;">For new installations, during installation create a custom partition setup and specify a separate partition for /home. For systems that were previously installed, create a new partition and configure /etc/fstab as appropriate.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Compliance References</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.2.3.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 14.6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 3.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: AC.L1-3.1.1,AC.L1-3.1.2,AC.L2-3.1.3,AC.L2-3.1.5,MP.L2-3.8.2
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 164.308(a)(3)(i),164.308(a)(3)(ii)(A),164.312(a)(1)
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: A.9.1.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: M1038
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: TA0005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: T1499,T1499.001
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: AC-5,AC-6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 7.1,7.1.1,7.1.2,7.1.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.3.1,7.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CC5.2,CC6.1
+                                    </span>
+                                
+                            </div>
+                        </div>
+                        
+                        
+                        
+                    </div>
+                </div>
+            
+                <div class="sca-rule" id="rule-19">
+                    <div class="sca-rule-header" onclick="toggleRule(19)">
+                        <div style="display: flex; justify-content: between; align-items: center;">
+                            <div style="flex: 1;">
+                                <span class="toggle-btn">▶</span>
+                                <strong style="margin-left: 0.5rem;">Ensure nodev option set on /home partition.</strong>
+                                <span style="margin-left: 1rem;" class="status-badge severity-undefined">N/A</span>
+                                <span style="margin-left: 0.5rem;" class="status-badge status-failed">FAILED</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sca-rule-content">
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Description</h4>
+                            <p style="color: #d1d5db;">The nodev mount option specifies that the filesystem cannot contain special devices.</p>
+                        </div>
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Rationale</h4>
+                            <p style="color: #d1d5db;">Since the /home filesystem is not intended to support devices, set this option to ensure that users cannot create a block or character special devices in /home.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #ef4444; margin-bottom: 0.5rem;">Remediation</h4>
+                            <p style="color: #d1d5db;">- IF - a separate partition exists for /home. Edit the /etc/fstab file and add nodev to the fourth field (mounting options) for the /home partition. Example: <device> /home <fstype> defaults,rw,nosuid,nodev,noexec,relatime 0 0 Run the following command to remount /home with the configured options: # mount -o remount /home.</p>
+                        </div>
+                        
+                        
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="color: #9ca3af; margin-bottom: 0.5rem;">Compliance References</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.1.2.3.2
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 14.6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 3.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: AC.L1-3.1.1,AC.L1-3.1.2,AC.L2-3.1.3,AC.L2-3.1.5,MP.L2-3.8.2
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 164.308(a)(3)(i),164.308(a)(3)(ii)(A),164.312(a)(1)
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: A.9.1.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: M1038
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: TA0005
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: T1200
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: AC-5,AC-6
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 7.1,7.1.1,7.1.2,7.1.3
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: 1.3.1,7.1
+                                    </span>
+                                
+                                    <span style="background: rgba(17, 24, 39, 0.8); border: 1px solid #374151; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                                        undefined: CC5.2,CC6.1
+                                    </span>
+                                
+                            </div>
+                        </div>
+                        
+                        
+                        
+                    </div>
+                </div>
+            
+            
+            <p style="color: #9ca3af; margin-top: 1rem; font-style: italic;">Showing top 20 of 279 SCA rules. Full results available in the dashboard.</p>
+        </div>
+        
+
+        <!-- Running Processes -->
+        <div class="section">
+            <h2>⚙️ Running Processes</h2>
+            
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Process Name</th>
+                            <th>PID</th>
+                            <th>Command</th>
+                            <th>Arguments</th>
+                            <th>Size (KB)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                            <tr>
+                                <td><strong>kworker/R-tpm_d</strong></td>
+                                <td>54</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>kworker/R-iprt-</strong></td>
+                                <td>548</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>kworker/R-kstrp</strong></td>
+                                <td>86</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>idle_inject/1</strong></td>
+                                <td>24</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>rcu_tasks_kthre</strong></td>
+                                <td>13</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>cupsd</strong></td>
+                                <td>1301</td>
+                                <td class="truncate" title="/usr/sbin/cupsd">/usr/sbin/cupsd</td>
+                                <td class="truncate" title="-l">-l</td>
+                                <td>11.44</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>unattended-upgr</strong></td>
+                                <td>1312</td>
+                                <td class="truncate" title="/usr/bin/python3">/usr/bin/python3</td>
+                                <td class="truncate" title="/usr/share/unattended-upgrades/unattended-upgrade-shutdown --wait-for-signal">/usr/share/unattended-upgrades/unattended-upgrade-shutdown --wait-for-signal</td>
+                                <td>29.52</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>kworker/u18:1</strong></td>
+                                <td>1316</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>cpuhp/2</strong></td>
+                                <td>29</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>kdevtmpfs</strong></td>
+                                <td>38</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>psimon</strong></td>
+                                <td>425</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>kworker/R-crypt</strong></td>
+                                <td>563</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>watchdogd</strong></td>
+                                <td>60</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>cron</strong></td>
+                                <td>889</td>
+                                <td class="truncate" title="/usr/sbin/cron">/usr/sbin/cron</td>
+                                <td class="truncate" title="-f -P">-f -P</td>
+                                <td>4.42</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>idle_inject/0</strong></td>
+                                <td>21</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>kerneloops</strong></td>
+                                <td>1941</td>
+                                <td class="truncate" title="/usr/sbin/kerneloops">/usr/sbin/kerneloops</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td>3.11</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>kworker/0:0H-ev</strong></td>
+                                <td>10</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>kworker/R-charg</strong></td>
+                                <td>104</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>migration/1</strong></td>
+                                <td>25</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>sshd</strong></td>
+                                <td>1327</td>
+                                <td class="truncate" title="sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups">sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups</td>
+                                <td class="truncate" title="N/A">N/A</td>
+                                <td>2.93</td>
+                            </tr>
+                        
+                    </tbody>
+                </table>
+                
+            
+        </div>
+
+        <!-- Open Network Ports -->
+        <div class="section">
+            <h2>🚪 Open Network Ports</h2>
+            
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Port</th>
+                            <th>Protocol</th>
+                            <th>State</th>
+                            <th>Local Address</th>
+                            <th>Remote Address</th>
+                            <th>Process</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                            <tr>
+                                <td><strong>22</strong></td>
+                                <td>tcp6</td>
+                                <td>
+                                    <span class="status-badge status-active">
+                                        listening
+                                    </span>
+                                </td>
+                                <td>::</td>
+                                <td>::</td>
+                                <td>systemd</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>53</strong></td>
+                                <td>udp</td>
+                                <td>
+                                    <span class="status-badge status-inactive">
+                                        N/A
+                                    </span>
+                                </td>
+                                <td>127.0.0.53</td>
+                                <td>0.0.0.0</td>
+                                <td>systemd-resolve</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>5353</strong></td>
+                                <td>udp</td>
+                                <td>
+                                    <span class="status-badge status-inactive">
+                                        N/A
+                                    </span>
+                                </td>
+                                <td>0.0.0.0</td>
+                                <td>0.0.0.0</td>
+                                <td>avahi-daemon</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>53</strong></td>
+                                <td>tcp</td>
+                                <td>
+                                    <span class="status-badge status-active">
+                                        listening
+                                    </span>
+                                </td>
+                                <td>127.0.0.53</td>
+                                <td>0.0.0.0</td>
+                                <td>systemd-resolve</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>68</strong></td>
+                                <td>udp</td>
+                                <td>
+                                    <span class="status-badge status-inactive">
+                                        N/A
+                                    </span>
+                                </td>
+                                <td>10.108.204.218</td>
+                                <td>10.108.204.1</td>
+                                <td>NetworkManager</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>631</strong></td>
+                                <td>tcp6</td>
+                                <td>
+                                    <span class="status-badge status-active">
+                                        listening
+                                    </span>
+                                </td>
+                                <td>::1</td>
+                                <td>::</td>
+                                <td>cupsd</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>5353</strong></td>
+                                <td>udp6</td>
+                                <td>
+                                    <span class="status-badge status-inactive">
+                                        N/A
+                                    </span>
+                                </td>
+                                <td>::</td>
+                                <td>::</td>
+                                <td>avahi-daemon</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>53</strong></td>
+                                <td>tcp</td>
+                                <td>
+                                    <span class="status-badge status-active">
+                                        listening
+                                    </span>
+                                </td>
+                                <td>127.0.0.54</td>
+                                <td>0.0.0.0</td>
+                                <td>systemd-resolve</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>48504</strong></td>
+                                <td>udp6</td>
+                                <td>
+                                    <span class="status-badge status-inactive">
+                                        N/A
+                                    </span>
+                                </td>
+                                <td>::</td>
+                                <td>::</td>
+                                <td>avahi-daemon</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>53</strong></td>
+                                <td>udp</td>
+                                <td>
+                                    <span class="status-badge status-inactive">
+                                        N/A
+                                    </span>
+                                </td>
+                                <td>127.0.0.54</td>
+                                <td>0.0.0.0</td>
+                                <td>systemd-resolve</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>631</strong></td>
+                                <td>tcp</td>
+                                <td>
+                                    <span class="status-badge status-active">
+                                        listening
+                                    </span>
+                                </td>
+                                <td>127.0.0.1</td>
+                                <td>0.0.0.0</td>
+                                <td>cupsd</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>53846</strong></td>
+                                <td>udp</td>
+                                <td>
+                                    <span class="status-badge status-inactive">
+                                        N/A
+                                    </span>
+                                </td>
+                                <td>0.0.0.0</td>
+                                <td>0.0.0.0</td>
+                                <td>avahi-daemon</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>9200</strong></td>
+                                <td>tcp6</td>
+                                <td>
+                                    <span class="status-badge status-active">
+                                        listening
+                                    </span>
+                                </td>
+                                <td>::ffff:127.0.0.1</td>
+                                <td>::</td>
+                                <td>java</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>55000</strong></td>
+                                <td>tcp6</td>
+                                <td>
+                                    <span class="status-badge status-active">
+                                        listening
+                                    </span>
+                                </td>
+                                <td>::</td>
+                                <td>::</td>
+                                <td>python3</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>1515</strong></td>
+                                <td>tcp</td>
+                                <td>
+                                    <span class="status-badge status-active">
+                                        listening
+                                    </span>
+                                </td>
+                                <td>0.0.0.0</td>
+                                <td>0.0.0.0</td>
+                                <td>wazuh-authd</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>9300</strong></td>
+                                <td>tcp6</td>
+                                <td>
+                                    <span class="status-badge status-active">
+                                        listening
+                                    </span>
+                                </td>
+                                <td>::ffff:127.0.0.1</td>
+                                <td>::</td>
+                                <td>java</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>1514</strong></td>
+                                <td>tcp</td>
+                                <td>
+                                    <span class="status-badge status-active">
+                                        listening
+                                    </span>
+                                </td>
+                                <td>0.0.0.0</td>
+                                <td>0.0.0.0</td>
+                                <td>wazuh-remoted</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>55000</strong></td>
+                                <td>tcp</td>
+                                <td>
+                                    <span class="status-badge status-active">
+                                        listening
+                                    </span>
+                                </td>
+                                <td>0.0.0.0</td>
+                                <td>0.0.0.0</td>
+                                <td>python3</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>443</strong></td>
+                                <td>tcp</td>
+                                <td>
+                                    <span class="status-badge status-active">
+                                        listening
+                                    </span>
+                                </td>
+                                <td>0.0.0.0</td>
+                                <td>0.0.0.0</td>
+                                <td>node</td>
+                            </tr>
+                        
+                            <tr>
+                                <td><strong>59035</strong></td>
+                                <td>udp</td>
+                                <td>
+                                    <span class="status-badge status-inactive">
+                                        N/A
+                                    </span>
+                                </td>
+                                <td>0.0.0.0</td>
+                                <td>0.0.0.0</td>
+                                <td>firefox</td>
+                            </tr>
+                        
+                    </tbody>
+                </table>
+                
+            
+        </div>
+
+        <!-- File Integrity Monitoring -->
+        <div class="section">
+            <h2>🔒 File Integrity Monitoring</h2>
+            <h3>Recent File Changes (Last 20)</h3>
+            
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>File Path</th>
+                            <th>Permissions</th>
+                            <th>MD5 Hash</th>
+                            <th>Size</th>
+                            <th>Modified Date</th>
+                            <th>Owner</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                            <tr>
+                                <td class="truncate" title="/usr/sbin/install-menu">/usr/sbin/install-menu</td>
+                                <td><code>rwxrwxrwx</code></td>
+                                <td class="truncate" title="d41d8cd98f00b204e9800998ecf8427e"><code>d41d8cd98f00b204e9800998ecf8427e</code></td>
+                                <td>N/A</td>
+                                <td>5/15/2025, 2:29:47 PM</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                            <tr>
+                                <td class="truncate" title="/usr/sbin/su-to-root">/usr/sbin/su-to-root</td>
+                                <td><code>rwxrwxrwx</code></td>
+                                <td class="truncate" title="d41d8cd98f00b204e9800998ecf8427e"><code>d41d8cd98f00b204e9800998ecf8427e</code></td>
+                                <td>N/A</td>
+                                <td>5/15/2025, 2:29:47 PM</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                            <tr>
+                                <td class="truncate" title="/usr/sbin/lynis">/usr/sbin/lynis</td>
+                                <td><code>rwxr-xr-x</code></td>
+                                <td class="truncate" title="ea3d700dd85e5222fe062ea7ab77a090"><code>ea3d700dd85e5222fe062ea7ab77a090</code></td>
+                                <td>N/A</td>
+                                <td>5/15/2025, 2:29:47 PM</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                            <tr>
+                                <td class="truncate" title="/usr/bin/oscap-vm">/usr/bin/oscap-vm</td>
+                                <td><code>rwxr-xr-x</code></td>
+                                <td class="truncate" title="7cad3883958d4686a406ed2d9e566a06"><code>7cad3883958d4686a406ed2d9e566a06</code></td>
+                                <td>N/A</td>
+                                <td>5/15/2025, 2:29:47 PM</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                            <tr>
+                                <td class="truncate" title="/usr/bin/su-to-root">/usr/bin/su-to-root</td>
+                                <td><code>rwxr-xr-x</code></td>
+                                <td class="truncate" title="579ba0579597a40368a9e38302b62c5b"><code>579ba0579597a40368a9e38302b62c5b</code></td>
+                                <td>N/A</td>
+                                <td>5/15/2025, 2:29:46 PM</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                            <tr>
+                                <td class="truncate" title="/usr/bin/update-menus">/usr/bin/update-menus</td>
+                                <td><code>rwxr-xr-x</code></td>
+                                <td class="truncate" title="81f2a6aa1514b2719cd0db7d1243b260"><code>81f2a6aa1514b2719cd0db7d1243b260</code></td>
+                                <td>N/A</td>
+                                <td>5/15/2025, 2:29:46 PM</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                            <tr>
+                                <td class="truncate" title="/usr/bin/oscap-ssh">/usr/bin/oscap-ssh</td>
+                                <td><code>rwxr-xr-x</code></td>
+                                <td class="truncate" title="488b5c2e528bb1f0a3aec890cb95a8f8"><code>488b5c2e528bb1f0a3aec890cb95a8f8</code></td>
+                                <td>N/A</td>
+                                <td>5/15/2025, 2:29:46 PM</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                            <tr>
+                                <td class="truncate" title="/usr/bin/oscap-run-sce-script">/usr/bin/oscap-run-sce-script</td>
+                                <td><code>rwxr-xr-x</code></td>
+                                <td class="truncate" title="99768a20fe239e3f8602a97f094c14af"><code>99768a20fe239e3f8602a97f094c14af</code></td>
+                                <td>N/A</td>
+                                <td>5/15/2025, 2:29:46 PM</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                            <tr>
+                                <td class="truncate" title="/usr/bin/oscap-podman">/usr/bin/oscap-podman</td>
+                                <td><code>rwxr-xr-x</code></td>
+                                <td class="truncate" title="8d4418fab4359b5fe494f64cb17bfa84"><code>8d4418fab4359b5fe494f64cb17bfa84</code></td>
+                                <td>N/A</td>
+                                <td>5/15/2025, 2:29:46 PM</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                            <tr>
+                                <td class="truncate" title="/usr/bin/wsdump">/usr/bin/wsdump</td>
+                                <td><code>rwxr-xr-x</code></td>
+                                <td class="truncate" title="c53687cd38bee866603d4f2d19caffd2"><code>c53687cd38bee866603d4f2d19caffd2</code></td>
+                                <td>N/A</td>
+                                <td>5/15/2025, 2:29:46 PM</td>
+                                <td>N/A</td>
+                            </tr>
+                        
+                    </tbody>
+                </table>
+            
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Wazuh Security Compliance Report</strong></p>
+            <p>Generated on 5/29/2025, 2:57:59 AM | Agent: Agent 000 (000)</p>
+            <p style="margin-top: 0.5rem; font-size: 0.9rem;">
+                This report contains sensitive security information. Handle with appropriate care and follow your organization's data protection policies.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+    

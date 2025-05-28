@@ -276,10 +276,12 @@ class WazuhService {
   }
 
   // Get processes information for an agent
-  async getAgentProcesses(agentId, limit = 10) {
+  async getAgentProcesses(agentId, limit = 1000) {
     const formattedAgentId = this.formatAgentId(agentId);
     console.log(`Requesting processes info for agent ID: ${formattedAgentId} (limit: ${limit})`);
-    return this.request('get', `/syscollector/${formattedAgentId}/processes?limit=${limit}`);
+    // If limit is 0 or negative, don't add limit parameter to get all processes
+    const limitParam = limit > 0 ? `?limit=${limit}` : '';
+    return this.request('get', `/syscollector/${formattedAgentId}/processes${limitParam}`);
   }
 
   // Get SCA (Security Configuration Assessment) results for an agent

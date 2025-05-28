@@ -367,27 +367,34 @@ const SystemInformation: React.FC<SystemInformationProps> = ({ agent }) => {
           {(!agent.syscheck || agent.syscheck.length === 0) ? (
             <div className="text-neutral-500">No recent file changes detected.</div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-xs">
-                <thead>
-                  <tr className="text-neutral-400">
-                    <th className="px-2 py-1 text-left">File Path</th>
-                    <th className="px-2 py-1 text-left">Perms</th>
-                    <th className="px-2 py-1 text-left">MD5</th>
-                    <th className="px-2 py-1 text-left">Modified</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {agent.syscheck.map((file: any, idx: number) => (
-                    <tr key={(file.file || file.path || idx)} className="border-t border-neutral-800">
-                      <td className="px-2 py-1 font-mono truncate max-w-[200px]" title={file.file || file.path}>{file.file || file.path || 'N/A'}</td>
-                      <td className="px-2 py-1">{file.perm || file.perms || ''}</td>
-                      <td className="px-2 py-1 font-mono truncate max-w-[120px]" title={file.md5}>{file.md5}</td>
-                      <td className="px-2 py-1">{file.mtime ? new Date(file.mtime).toLocaleString() : ''}</td>
+            <div>
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-xs">
+                  <thead>
+                    <tr className="text-neutral-400">
+                      <th className="px-2 py-1 text-left">File Path</th>
+                      <th className="px-2 py-1 text-left">Perms</th>
+                      <th className="px-2 py-1 text-left">MD5</th>
+                      <th className="px-2 py-1 text-left">Modified</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {agent.syscheck.slice(0, 20).map((file: any, idx: number) => (
+                      <tr key={(file.file || file.path || idx)} className="border-t border-neutral-800">
+                        <td className="px-2 py-1 font-mono truncate max-w-[200px]" title={file.file || file.path}>{file.file || file.path || 'N/A'}</td>
+                        <td className="px-2 py-1">{file.perm || file.perms || ''}</td>
+                        <td className="px-2 py-1 font-mono truncate max-w-[120px]" title={file.md5}>{file.md5}</td>
+                        <td className="px-2 py-1">{file.mtime ? new Date(file.mtime).toLocaleString() : ''}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {agent.syscheck.length > 20 && (
+                <div className="mt-2 text-xs text-neutral-500 text-center">
+                  Showing 20 of {agent.syscheck.length} file changes. Export HTML report for complete data.
+                </div>
+              )}
             </div>
           )}
         </div>

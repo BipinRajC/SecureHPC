@@ -179,54 +179,89 @@ const WazuhResult: React.FC = () => {
         const portsResponse = await axios.get(`http://localhost:3001/api/tools/wazuh/agents/${agentId}/ports`);
         if (portsResponse.data.status === 'ok') {
           agentData.ports = portsResponse.data.data.data.affected_items || [];
+          console.log(`Fetched ${agentData.ports.length} ports for agent ${agentId}`);
+        } else {
+          console.warn(`Failed to fetch ports for agent ${agentId}:`, portsResponse.data);
+          agentData.ports = [];
         }
         
         console.log(`Fetching packages for agent ${agentId}...`);
-        const packagesResponse = await axios.get(`http://localhost:3001/api/tools/wazuh/agents/${agentId}/packages?limit=20`);
+        const packagesResponse = await axios.get(`http://localhost:3001/api/tools/wazuh/agents/${agentId}/packages`);
         if (packagesResponse.data.status === 'ok') {
           agentData.packages = packagesResponse.data.data.data.affected_items || [];
+          console.log(`Fetched ${agentData.packages.length} packages for agent ${agentId}`);
+        } else {
+          console.warn(`Failed to fetch packages for agent ${agentId}:`, packagesResponse.data);
+          agentData.packages = [];
         }
         
         console.log(`Fetching processes for agent ${agentId}...`);
-        const processesResponse = await axios.get(`http://localhost:3001/api/tools/wazuh/agents/${agentId}/processes?limit=20`);
+        const processesResponse = await axios.get(`http://localhost:3001/api/tools/wazuh/agents/${agentId}/processes`);
         if (processesResponse.data.status === 'ok') {
           agentData.processes = processesResponse.data.data.data.affected_items || [];
+          console.log(`Fetched ${agentData.processes.length} processes for agent ${agentId}`);
+        } else {
+          console.warn(`Failed to fetch processes for agent ${agentId}:`, processesResponse.data);
+          agentData.processes = [];
         }
         
         console.log(`Fetching SCA results for agent ${agentId}...`);
         const scaResponse = await axios.get(`http://localhost:3001/api/tools/wazuh/agents/${agentId}/sca`);
         if (scaResponse.data.status === 'ok') {
           agentData.sca = scaResponse.data.data.data.affected_items || [];
+          console.log(`Fetched ${agentData.sca.length} SCA policies for agent ${agentId}`);
+        } else {
+          console.warn(`Failed to fetch SCA for agent ${agentId}:`, scaResponse.data);
+          agentData.sca = [];
         }
         
         console.log(`Fetching netiface for agent ${agentId}...`);
         const netifaceResponse = await axios.get(`http://localhost:3001/api/tools/wazuh/agents/${agentId}/netiface`);
         if (netifaceResponse.data.status === 'ok') {
           agentData.netiface = netifaceResponse.data.data.data.affected_items || [];
+          console.log(`Fetched ${agentData.netiface.length} network interfaces for agent ${agentId}`);
+        } else {
+          console.warn(`Failed to fetch netiface for agent ${agentId}:`, netifaceResponse.data);
+          agentData.netiface = [];
         }
         
         console.log(`Fetching netproto for agent ${agentId}...`);
         const netprotoResponse = await axios.get(`http://localhost:3001/api/tools/wazuh/agents/${agentId}/netproto`);
         if (netprotoResponse.data.status === 'ok') {
           agentData.netproto = netprotoResponse.data.data.data.affected_items || [];
+          console.log(`Fetched ${agentData.netproto.length} network protocols for agent ${agentId}`);
+        } else {
+          console.warn(`Failed to fetch netproto for agent ${agentId}:`, netprotoResponse.data);
+          agentData.netproto = [];
         }
         
         console.log(`Fetching syscheck for agent ${agentId}...`);
         const syscheckResponse = await axios.get(`http://localhost:3001/api/tools/wazuh/agents/${agentId}/syscheck`);
         if (syscheckResponse.data.status === 'ok') {
-          // Syscheck: sort by date desc, take latest 10
+          // Get all syscheck items, sorted by date descending for better organization
           const syscheckItems = syscheckResponse.data.data.data.affected_items || [];
           const files = syscheckItems
-            .filter((f: any) => f.date)
-            .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
-            .slice(0, 10)
+            .filter((f: any) => f.date || f.mtime) // Keep all files with modification time
+            .sort((a: any, b: any) => {
+              const dateA = new Date(a.date || a.mtime).getTime();
+              const dateB = new Date(b.date || b.mtime).getTime();
+              return dateB - dateA; // Most recent first
+            })
             .map((f: any) => ({
               file: f.file,
+              path: f.path, // Include both file and path fields
               perm: f.perm,
               md5: f.md5,
-              mtime: f.date
+              size: f.size,
+              mtime: f.date || f.mtime,
+              date: f.date || f.mtime,
+              uname: f.uname
             }));
           agentData.syscheck = files;
+          console.log(`Fetched ${files.length} syscheck files for agent ${agentId}`);
+        } else {
+          console.warn(`Failed to fetch syscheck for agent ${agentId}:`, syscheckResponse.data);
+          agentData.syscheck = [];
         }
         
         // If we have the basic agent info from the list and at least one additional data source,

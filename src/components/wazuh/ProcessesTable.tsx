@@ -61,7 +61,7 @@ const ProcessesTable: React.FC<ProcessesTableProps> = ({ processes }) => {
             </tr>
           </thead>
           <tbody>
-            {sortedProcesses.slice(0, 10).map((process, index) => (
+            {sortedProcesses.slice(0, 20).map((process, index) => (
               <tr 
                 key={`${process.pid}-${index}`} 
                 className="border-b border-neutral-800 hover:bg-background-light"
@@ -93,7 +93,10 @@ const ProcessesTable: React.FC<ProcessesTableProps> = ({ processes }) => {
       <div className="flex justify-between items-center mt-4 text-xs text-neutral-500">
         <div className="flex items-center">
           <Cpu className="h-4 w-4 mr-1" />
-          <span>Top 10 processes shown</span>
+          <span>Top 20 processes shown</span>
+          {processes.length > 20 && (
+            <span className="ml-2 text-neutral-400">({processes.length} total - export HTML for complete data)</span>
+          )}
         </div>
         <div className="flex items-center">
           <Clock className="h-4 w-4 mr-1" />

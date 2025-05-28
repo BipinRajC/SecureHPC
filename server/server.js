@@ -237,7 +237,9 @@ app.get('/api/tools/wazuh/agents/:agentId/packages', async (req, res) => {
 app.get('/api/tools/wazuh/agents/:agentId/processes', async (req, res) => {
   try {
     const { agentId } = req.params;
-    const limit = parseInt(req.query.limit) || 10;
+    // Default to 20 for dashboard, but allow larger limits for HTML exports
+    // If limit=0 is passed, get all processes (no limit)
+    const limit = req.query.limit ? parseInt(req.query.limit) : 20;
     const processes = await wazuhService.getAgentProcesses(agentId, limit);
     res.json({
       status: 'ok',
