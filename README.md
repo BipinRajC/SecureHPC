@@ -69,7 +69,7 @@ A comprehensive, full-stack security compliance monitoring and reporting platfor
 
 1. **Clone the repository:**
 ```bash
-git clone <repository-url>
+git clone https://github.com/BipinRajC/SecureHPC
 cd wazuh-isolated
 ```
 
