@@ -6,6 +6,9 @@ import {
   Settings, Search, Info, PlusCircle, Hammer, ShieldAlert, 
   Loader2
 } from 'lucide-react';
+import SSHConfigModal from '../components/SSHConfigModal';
+import LynisScanProgress from '../components/LynisScanProgress';
+import axios from 'axios';
 
 const ToolIntegrations: React.FC = () => {
   const { 
@@ -19,42 +22,72 @@ const ToolIntegrations: React.FC = () => {
   } = useComplianceStore();
   const [scanningTool, setScanningTool] = useState<string | null>(null);
   const [activatingTool, setActivatingTool] = useState<string | null>(null);
+  const [sshModalOpen, setSSHModalOpen] = useState(false);
+  const [selectedTool, setSelectedTool] = useState<'lynis' | 'openscap'>('lynis');
+  const [lynisScanJobId, setLynisScanJobId] = useState<string | null>(null);
+  const [scanOptions, setScanOptions] = useState({
+    quick: true,
+    testGroups: [] as string[]
+  });
+  const [showScanOptions, setShowScanOptions] = useState(false);
   const navigate = useNavigate();
+  const [lastRunTimes, setLastRunTimes] = useState({
+    lynis: localStorage.getItem('lynis_last_run'),
+    openscap: localStorage.getItem('openscap_last_run'),
+  });
 
   useEffect(() => {
     fetchTools();
+    // Listen for localStorage changes to update last run times
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'lynis_last_run' || e.key === 'openscap_last_run') {
+        setLastRunTimes({
+          lynis: localStorage.getItem('lynis_last_run'),
+          openscap: localStorage.getItem('openscap_last_run'),
+        });
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
   }, [fetchTools]);
 
   const handleRunTool = async (toolId: string) => {
     // Show loading state
     setScanningTool(toolId);
     
-    if (toolId === 'lynis') {
+    if (toolId === 'tool-1') { // Lynis
       try {
-        // Set the lynis_ran flag for the hardcoded 78% compliance score
-        if (typeof window !== 'undefined') {
-          sessionStorage.setItem('lynis_ran', 'true');
-          localStorage.setItem('lynis_ran', 'true');
+        // For Lynis, use our improved API that returns immediately
+        const connectionId = localStorage.getItem('ssh_connection_id');
+        
+        if (!connectionId) {
+          alert('SSH connection not configured. Please configure SSH first.');
+          setScanningTool(null);
+          return;
         }
         
-        // Call the store method to generate data
-        await runLynisScan();
+        // Make a direct API call to start the scan with options
+        const response = await axios.post('http://localhost:3001/api/tools/lynis/remote-scan', {
+          connectionId,
+          options: scanOptions
+        });
         
-        // Set a flag in sessionStorage to indicate dashboard should refresh data
-        sessionStorage.setItem('dashboard_refresh', 'true');
-        
-        // Wait briefly then navigate to dashboard
-        setTimeout(() => {
-          setScanningTool(null);
-          navigate('/', { state: { refreshData: true } });
-        }, 1000);
+        if (response.data.status === 'ok') {
+          // Store the job ID for progress tracking
+          setLynisScanJobId(response.data.job_id);
+          
+          // Set the state flag
+          localStorage.setItem('lynis_running', 'true');
+          sessionStorage.setItem('lynis_ran', 'true');
+        } else {
+          throw new Error(response.data.message || 'Failed to start scan');
+        }
       } catch (error) {
         console.error('Error:', error);
         setScanningTool(null);
-        // Still navigate even if there's an error
-        navigate('/');
+        alert('Failed to start Lynis scan. Please try again.');
       }
-    } else if (toolId === 'openscap') {
+    } else if (toolId === 'tool-2') { // OpenSCAP
       try {
         // For OpenSCAP, run the scan and navigate to the OVAL report page
         await runOpenScapScan();
@@ -82,13 +115,49 @@ const ToolIntegrations: React.FC = () => {
       }
     }
   };
+  
+  const handleScanComplete = (results: any) => {
+    // Store scan results in localStorage for dashboard
+    if (results.hardening_index) {
+      localStorage.setItem('lynis_score', results.hardening_index.toString());
+    }
+    if (results.tests_performed) {
+      localStorage.setItem('lynis_tests', results.tests_performed.toString());
+    }
+    if (results.suggestions) {
+      localStorage.setItem('lynis_suggestions', results.suggestions.toString());
+    }
+    if (results.warnings) {
+      localStorage.setItem('lynis_warnings', results.warnings.toString());
+    }
+    // Use the backend-provided last_run if available, otherwise fallback to now
+    if (results.last_run) {
+      localStorage.setItem('lynis_last_run', results.last_run);
+    } else {
+      localStorage.setItem('lynis_last_run', new Date().toISOString());
+    }
+    // Reset UI state
+    setScanningTool(null);
+    setLynisScanJobId(null);
+    // Navigate to dashboard to see results
+    setTimeout(() => {
+      navigate('/', { state: { refreshData: true } });
+    }, 1500);
+  };
+  
+  const handleScanError = (errorMessage: string) => {
+    console.error('Scan error:', errorMessage);
+    setScanningTool(null);
+    setLynisScanJobId(null);
+    alert(`Scan failed: ${errorMessage}`);
+  };
 
   const handleActivateTool = async (toolId: string) => {
     try {
       setActivatingTool(toolId);
       
       // Set the lynis_ran flag for the hardcoded 78% compliance score
-      if (toolId === 'lynis' && typeof window !== 'undefined') {
+      if (toolId === 'tool-1' && typeof window !== 'undefined') {
         sessionStorage.setItem('lynis_ran', 'true');
         localStorage.setItem('lynis_ran', 'true');
       }
@@ -97,7 +166,7 @@ const ToolIntegrations: React.FC = () => {
       setActivatingTool(null);
       
       // If activating Lynis, navigate to dashboard after a short delay
-      if (toolId === 'lynis') {
+      if (toolId === 'tool-1') {
         // Add a small delay for better UX - allowing time for the store to run the scan
         setTimeout(() => {
           navigate('/', { state: { refreshData: true } });
@@ -107,6 +176,49 @@ const ToolIntegrations: React.FC = () => {
       console.error('Failed to activate tool:', error);
       setActivatingTool(null);
     }
+  };
+
+  const handleConfigureTool = (toolId: string) => {
+    console.log("Configuring tool with ID:", toolId, "type:", typeof toolId);
+    
+    // Match the actual tool IDs from the mock data
+    if (toolId === 'tool-1') { // Lynis
+      setSelectedTool('lynis');
+      setSSHModalOpen(true);
+    } else if (toolId === 'tool-2') { // OpenSCAP
+      setSelectedTool('openscap');
+      setSSHModalOpen(true);
+    } else if (toolId === 'tool-3') { // Wazuh
+      window.location.href = 'http://localhost:5173/integrations/wazuh-config';
+    } else {
+      alert(`Configure ${toolId} - Feature coming soon!`);
+    }
+  };
+
+  const handleSSHConfigured = (connectionId: string) => {
+    console.log(`SSH connection established for ${selectedTool} with ID: ${connectionId}`);
+    
+    // Store the connection ID in localStorage for scans
+    localStorage.setItem('ssh_connection_id', connectionId);
+    
+    // Update the tool status to active
+    const updatedTool = tools.find(t => {
+      if (selectedTool === 'lynis') return t.id === 'tool-1';
+      if (selectedTool === 'openscap') return t.id === 'tool-2';
+      return false;
+    });
+    
+    if (updatedTool) {
+      updatedTool.status = 'active';
+      // Using type assertion to avoid TypeScript error since lastUpdated might not be in the interface
+      (updatedTool as any).lastUpdated = new Date().toISOString();
+      // In a real app, you'd save this to the server
+    }
+    
+    fetchTools(); // Refresh the tools list
+    
+    // Show success message
+    alert(`${selectedTool === 'lynis' ? 'Lynis' : 'OpenSCAP'} successfully configured!`);
   };
 
   const getStatusIcon = (status: string) => {
@@ -151,6 +263,20 @@ const ToolIntegrations: React.FC = () => {
         return <GitMerge size={18} className="text-neutral-400" />;
     }
   };
+  
+  // Handle selection of test groups for faster scanning
+  const handleTestGroupSelection = (group: string) => {
+    setScanOptions(prev => {
+      const newGroups = prev.testGroups.includes(group)
+        ? prev.testGroups.filter(g => g !== group)
+        : [...prev.testGroups, group];
+      
+      return {
+        ...prev,
+        testGroups: newGroups
+      };
+    });
+  };
 
   return (
     <div>
@@ -166,6 +292,60 @@ const ToolIntegrations: React.FC = () => {
           </button>
         </div>
       </div>
+      
+      {/* Lynis Scan Progress Tracker */}
+      {lynisScanJobId && (
+        <LynisScanProgress 
+          jobId={lynisScanJobId}
+          onComplete={handleScanComplete}
+          onError={handleScanError}
+        />
+      )}
+      
+      {/* Scan Options Panel */}
+      {showScanOptions && (
+        <div className="card mb-6">
+          <h3 className="text-lg font-medium text-white mb-4">Lynis Scan Options</h3>
+          
+          <div className="space-y-4">
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="quick-scan"
+                checked={scanOptions.quick}
+                onChange={() => setScanOptions(prev => ({ ...prev, quick: !prev.quick }))}
+                className="mr-2"
+              />
+              <label htmlFor="quick-scan" className="text-neutral-300">
+                Use Quick Scan Mode (Faster)
+              </label>
+            </div>
+            
+            <div>
+              <p className="text-neutral-300 mb-2">Select Test Groups (Optional)</p>
+              <div className="grid grid-cols-2 gap-2">
+                {['authentication', 'file_permissions', 'firewall', 'ssh', 'malware', 'crypto'].map(group => (
+                  <div key={group} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id={`group-${group}`}
+                      checked={scanOptions.testGroups.includes(group)}
+                      onChange={() => handleTestGroupSelection(group)}
+                      className="mr-2"
+                    />
+                    <label htmlFor={`group-${group}`} className="text-neutral-400 capitalize">
+                      {group}
+                    </label>
+                  </div>
+                ))}
+              </div>
+              <p className="text-neutral-500 text-sm mt-2">
+                Selecting specific test groups will make the scan faster
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="card mb-6">
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between mb-4">
@@ -196,221 +376,114 @@ const ToolIntegrations: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            {tools.map((tool) => (
-              <div key={tool.id} className="bg-background-light p-4 rounded-lg border border-neutral-800 hover:border-primary-700 transition-colors">
-                <div className="flex flex-col md:flex-row justify-between">
-                  <div className="mb-4 md:mb-0">
-                    <div className="flex items-center mb-2">
-                      {getTypeIcon(tool.type)}
-                      <h3 className="font-medium text-white ml-2">{tool.name}</h3>
-                      <div className="ml-3 flex items-center">
-                        {getStatusIcon(tool.status)}
-                        <span className="text-sm ml-1">{getStatusText(tool.status)}</span>
+            {tools.map((tool) => {
+              // Patch last run time for Lynis and OpenSCAP from localStorage
+              let lastRun = tool.lastRun;
+              if (tool.id === 'tool-1' && lastRunTimes.lynis) {
+                lastRun = lastRunTimes.lynis;
+              }
+              if (tool.id === 'tool-2' && lastRunTimes.openscap) {
+                lastRun = lastRunTimes.openscap;
+              }
+              return (
+                <div key={tool.id} className="bg-background-light p-4 rounded-lg border border-neutral-800 hover:border-primary-700 transition-colors">
+                  <div className="flex flex-col md:flex-row justify-between">
+                    <div className="mb-4 md:mb-0">
+                      <div className="flex items-center mb-2">
+                        {getTypeIcon(tool.type)}
+                        <h3 className="ml-2 font-medium text-white flex items-center">
+                          {tool.name}
+                          {tool.status === 'active' && (
+                            <span className="ml-2 px-2 py-0.5 text-xs bg-success-900 text-success-300 rounded-full">Active</span>
+                          )}
+                        </h3>
+                      </div>
+                      <p className="text-neutral-400 text-sm mb-1">{tool.description}</p>
+                      <div className="flex items-center text-xs text-neutral-500">
+                        <span className="flex items-center mr-4">
+                          {getStatusIcon(tool.status)}
+                          <span className="ml-1">Status: {getStatusText(tool.status)}</span>
+                        </span>
+                        {lastRun && (
+                          <span>Last run: {new Date(lastRun).toLocaleString()}</span>
+                        )}
                       </div>
                     </div>
                     
-                    <p className="text-sm text-neutral-300 mb-2">
-                      {tool.description}
-                    </p>
-                    
-                    <div className="flex flex-wrap gap-2 text-xs">
-                      {tool.supportedFrameworks.map((frameworkId) => (
-                        <span key={frameworkId} className="badge-neutral">
-                          {frameworkId.replace(/-/g, ' ').toUpperCase()}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-col justify-between items-end">
-                    <div className="text-sm text-neutral-400 mb-2">
-                      Version: {tool.version || 'Unknown'}
-                    </div>
-                    
-                    <div className="flex space-x-2 md:justify-end justify-start w-full">
-                      <button 
-                        className="btn-outline py-1 px-3 text-sm w-24"
-                        onClick={() => {
-                          if (tool.id === 'wazuh') {
-                            window.location.href = 'http://localhost:5173/integrations/wazuh-config';
-                          } else {
-                            alert(`Configure ${tool.name} - Feature coming soon!`);
-                          }
-                        }}
-                      >
-                        Configure
-                      </button>
-                      {tool.status === 'active' ? (
-                        <>
-                          {tool.id === 'wazuh' && (
-                            <button 
-                              className="btn-secondary py-1 px-3 text-sm"
-                              onClick={() => window.location.href = 'http://localhost:5173/wazuh-result'}
-                            >
-                              View Dashboard
-                            </button>
-                          )}
-                        <button 
-                          className={`btn-primary py-1 px-3 text-sm w-24 ${scanningTool === tool.id ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    <div className="flex space-x-2">
+                      {tool.id === 'tool-1' && tool.status === 'active' && !scanningTool && !lynisScanJobId && (
+                        <button
+                          className="btn-outline-sm"
+                          onClick={() => setShowScanOptions(!showScanOptions)}
+                        >
+                          <Settings size={16} className="mr-1" />
+                          {showScanOptions ? 'Hide Options' : 'Scan Options'}
+                        </button>
+                      )}
+                      
+                      {tool.status === 'active' && (
+                        <button
+                          className="btn-primary-sm"
                           onClick={() => handleRunTool(tool.id)}
-                          disabled={scanningTool === tool.id || loading.lynisRunning}
+                          disabled={scanningTool === tool.id || !!lynisScanJobId}
                         >
                           {scanningTool === tool.id ? (
                             <>
-                              <Loader2 size={16} className="mr-1 animate-spin" />
+                              <Loader2 size={16} className="animate-spin mr-1" />
                               Running...
                             </>
-                          ) : 'Run'}
+                          ) : (
+                            <>
+                              <ShieldAlert size={16} className="mr-1" />
+                              Run Scan
+                            </>
+                          )}
                         </button>
-                        </>
-                      ) : (
-                        <button 
-                          className={`btn-secondary py-1 px-3 text-sm w-24 ${activatingTool === tool.id ? 'opacity-70 cursor-not-allowed' : ''}`}
+                      )}
+                      
+                      {tool.status === 'inactive' && (
+                        <button
+                          className="btn-primary-sm"
                           onClick={() => handleActivateTool(tool.id)}
                           disabled={activatingTool === tool.id}
                         >
                           {activatingTool === tool.id ? (
                             <>
-                              <Loader2 size={16} className="mr-1 animate-spin" />
+                              <Loader2 size={16} className="animate-spin mr-1" />
                               Activating...
                             </>
-                          ) : 'Activate'}
+                          ) : (
+                            <>
+                              <CheckCircle2 size={16} className="mr-1" />
+                              Activate
+                            </>
+                          )}
                         </button>
                       )}
+                      
+                      <button
+                        className="btn-outline-sm"
+                        onClick={() => handleConfigureTool(tool.id)}
+                        disabled={scanningTool === tool.id}
+                      >
+                        <Settings size={16} className="mr-1" />
+                        Configure
+                      </button>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-            
-            {tools.length === 0 && (
-              <div className="text-center py-12 text-neutral-500">
-                <GitMerge size={40} className="mx-auto mb-3 opacity-30" />
-                <p className="mb-2">No tools configured</p>
-                <p className="text-sm">Add your first security tool integration to get started</p>
-              </div>
-            )}
+              );
+            })}
           </div>
         )}
       </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="card">
-          <h2 className="text-lg font-medium text-white mb-4">Available Integrations</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="p-4 bg-background-light rounded-lg border border-neutral-800 hover:border-primary-700 transition-colors cursor-pointer">
-              <div className="flex items-center mb-2">
-                <ShieldAlert size={20} className="text-primary-400" />
-                <h3 className="font-medium text-white ml-2">Wazuh</h3>
-              </div>
-              <p className="text-sm text-neutral-300 mb-3">
-                Open source security monitoring solution
-              </p>
-              <button 
-                className="text-primary-400 text-sm hover:text-primary-300"
-                onClick={() => window.location.href = 'http://localhost:5173/integrations/wazuh-config'}
-              >
-                Configure now
-              </button>
-            </div>
-            
-            <div className="p-4 bg-background-light rounded-lg border border-neutral-800 hover:border-primary-700 transition-colors cursor-pointer">
-              <div className="flex items-center mb-2">
-                <ShieldAlert size={20} className="text-primary-400" />
-                <h3 className="font-medium text-white ml-2">OpenSCAP</h3>
-              </div>
-              <p className="text-sm text-neutral-300 mb-3">
-                Security compliance and vulnerability scanning
-              </p>
-              <button className="text-primary-400 text-sm hover:text-primary-300">
-                Learn more
-              </button>
-            </div>
 
-            <div className="p-4 bg-background-light rounded-lg border border-neutral-800 hover:border-primary-400 transition-colors">
-              <div className="flex items-center mb-2">
-                <ShieldAlert size={20} className="text-primary-400" />
-                <h3 className="font-medium text-white ml-2">Falco</h3>
-             </div>
-             <p className="text-sm text-neutral-300 mb-3">
-                Runtime security monitoring for cloud-native environments.
-             </p>
-             <button className="text-primary-400 text-sm hover:text-primary-300">
-               Learn more
-             </button>
-           </div>
-            
-            <div className="p-4 bg-background-light rounded-lg border border-neutral-800 hover:border-primary-700 transition-colors cursor-pointer">
-              <div className="flex items-center mb-2">
-                <ShieldAlert size={20} className="text-primary-400" />
-                <h3 className="font-medium text-white ml-2">Prowler</h3>
-              </div>
-              <p className="text-sm text-neutral-300 mb-3">
-                AWS security assessment and auditing
-              </p>
-              <button className="text-primary-400 text-sm hover:text-primary-300">
-                Learn more
-              </button>
-            </div>
-            
-            <div className="p-4 bg-background-light rounded-lg border border-neutral-800 hover:border-primary-700 transition-colors cursor-pointer">
-              <div className="flex items-center mb-2">
-                <ShieldAlert size={20} className="text-primary-400" />
-                <h3 className="font-medium text-white ml-2">Lynis</h3>
-              </div>
-              <p className="text-sm text-neutral-300 mb-3">
-                Security auditing for Unix/Linux systems
-              </p>
-              <button className="text-primary-400 text-sm hover:text-primary-300">
-                Learn more
-              </button>
-            </div>
-          </div>
-        </div>
-        
-        <div className="card">
-          <h2 className="text-lg font-medium text-white mb-4">Integration Documentation</h2>
-          <p className="text-neutral-300 mb-4">
-            Learn how to integrate security tools with the HPC Security Compliance Framework.
-          </p>
-          
-          <div className="space-y-3">
-            <div className="p-3 bg-background-light rounded flex items-center">
-              <Info size={20} className="text-primary-400 mr-3" />
-              <div>
-                <h3 className="font-medium text-white">Wazuh Integration Guide</h3>
-                <p className="text-xs text-neutral-400">Setting up and configuring Wazuh agents</p>
-              </div>
-            </div>
-            
-            <div className="p-3 bg-background-light rounded flex items-center">
-              <Info size={20} className="text-primary-400 mr-3" />
-              <div>
-                <h3 className="font-medium text-white">OpenSCAP Integration Guide</h3>
-                <p className="text-xs text-neutral-400">Configuring compliance profiles and scans</p>
-              </div>
-            </div>
-            
-            <div className="p-3 bg-background-light rounded flex items-center">
-              <Info size={20} className="text-primary-400 mr-3" />
-              <div>
-                <h3 className="font-medium text-white">API Integration</h3>
-                <p className="text-xs text-neutral-400">Using the REST API for custom tool integration</p>
-              </div>
-            </div>
-            
-            <div className="p-3 bg-background-light rounded flex items-center">
-              <Info size={20} className="text-primary-400 mr-3" />
-              <div>
-                <h3 className="font-medium text-white">Troubleshooting Guide</h3>
-                <p className="text-xs text-neutral-400">Common integration issues and solutions</p>
-              </div>
-            </div>
-          </div>
-          
-          <button className="btn-outline w-full mt-4">View All Documentation</button>
-        </div>
-      </div>
+      <SSHConfigModal 
+        isOpen={sshModalOpen} 
+        onClose={() => setSSHModalOpen(false)}
+        onConfigured={handleSSHConfigured}
+        tool={selectedTool}
+      />
     </div>
   );
 };

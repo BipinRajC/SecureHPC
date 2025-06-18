@@ -93,7 +93,7 @@ const PortsTable: React.FC<PortsTableProps> = ({ ports }) => {
             </tr>
           </thead>
           <tbody>
-            {sortedPorts.slice(0, 20).map((port, index) => {
+            {sortedPorts.slice(0, 10).map((port, index) => {
               const securityLevel = getSecurityLevel(
                 port.local?.port, 
                 port.protocol, 
@@ -144,10 +144,7 @@ const PortsTable: React.FC<PortsTableProps> = ({ ports }) => {
         </div>
         <div className="flex items-center">
           <Globe className="h-4 w-4 mr-1" />
-          <span>Top 20 ports shown</span>
-          {ports.length > 20 && (
-            <span className="ml-2 text-neutral-400">({ports.length} total - export HTML for complete data)</span>
-          )}
+          <span>Top 10 ports shown</span>
         </div>
       </div>
     </div>

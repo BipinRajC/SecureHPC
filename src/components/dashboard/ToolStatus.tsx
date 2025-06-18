@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Tool } from '../../types/compliance';
-import { formatDistanceToNow } from 'date-fns';
 import { Link } from 'react-router-dom';
 import { AlertCircle, CheckCircle2, Clock, Settings, ArrowRight } from 'lucide-react';
 
@@ -9,6 +8,23 @@ interface ToolStatusProps {
 }
 
 const ToolStatus: React.FC<ToolStatusProps> = ({ tools }) => {
+  const [lastRuns, setLastRuns] = useState<{ [tool: string]: string | null }>({});
+
+  useEffect(() => {
+    // Always get the latest from localStorage
+    setLastRuns({
+      lynis: localStorage.getItem('lynis_last_run'),
+      openscap: localStorage.getItem('openscap_last_run'),
+    });
+    // Listen for storage changes (cross-tab)
+    const handler = () => setLastRuns({
+      lynis: localStorage.getItem('lynis_last_run'),
+      openscap: localStorage.getItem('openscap_last_run'),
+    });
+    window.addEventListener('storage', handler);
+    return () => window.removeEventListener('storage', handler);
+  }, []);
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'active':
@@ -39,6 +55,16 @@ const ToolStatus: React.FC<ToolStatusProps> = ({ tools }) => {
     }
   };
 
+  const getLastRun = (tool: Tool) => {
+    if (tool.name.toLowerCase().includes('lynis')) {
+      return lastRuns.lynis;
+    }
+    if (tool.name.toLowerCase().includes('openscap')) {
+      return lastRuns.openscap;
+    }
+    return tool.lastRun;
+  };
+
   return (
     <div className="card">
       <div className="flex justify-between items-center mb-4">
@@ -49,20 +75,23 @@ const ToolStatus: React.FC<ToolStatusProps> = ({ tools }) => {
       </div>
       
       <div className="space-y-4">
-        {tools.map((tool) => (
-          <div key={tool.id} className="flex items-center justify-between p-3 bg-background-light rounded-lg">
-            <div className="flex items-center">
-              <div className="mr-3">{getStatusIcon(tool.status)}</div>
-              <div>
-                <h3 className="font-medium text-white">{tool.name}</h3>
-                <p className="text-xs text-neutral-400">
-                  {tool.lastRun ? `Last run ${formatDistanceToNow(new Date(tool.lastRun), { addSuffix: true })}` : 'Never run'}
-                </p>
+        {tools.map((tool) => {
+          const lastRun = getLastRun(tool);
+          return (
+            <div key={tool.id} className="flex items-center justify-between p-3 bg-background-light rounded-lg">
+              <div className="flex items-center">
+                <div className="mr-3">{getStatusIcon(tool.status)}</div>
+                <div>
+                  <h3 className="font-medium text-white">{tool.name}</h3>
+                  <p className="text-xs text-neutral-400">
+                    {lastRun ? `Last run: ${new Date(lastRun).toLocaleString()}` : 'Never run'}
+                  </p>
+                </div>
               </div>
+              <div className="text-sm">{getStatusText(tool.status)}</div>
             </div>
-            <div className="text-sm">{getStatusText(tool.status)}</div>
-          </div>
-        ))}
+          );
+        })}
         
         {tools.length === 0 && (
           <div className="text-center py-6 text-neutral-500">

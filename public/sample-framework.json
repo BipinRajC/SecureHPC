@@ -1,0 +1,69 @@
+[
+  {
+    "id": "SEC-001",
+    "title": "Implement Strong Password Policies",
+    "description": "Ensure all user accounts have strong passwords that meet minimum complexity requirements",
+    "severity": "high",
+    "category": "Authentication",
+    "requirements": [
+      "Minimum 12 characters length",
+      "Combination of uppercase, lowercase, numbers, and special characters",
+      "Password rotation policy enforced"
+    ],
+    "remediation": "Configure password policy in system settings to enforce complexity requirements",
+    "automated": true
+  },
+  {
+    "id": "SEC-002",
+    "title": "Enable Multi-Factor Authentication",
+    "description": "Multi-factor authentication should be enabled for all privileged accounts",
+    "severity": "critical",
+    "category": "Authentication",
+    "requirements": [
+      "MFA enabled for admin accounts",
+      "Hardware or software tokens configured"
+    ],
+    "remediation": "Implement MFA solution and enforce for privileged accounts",
+    "automated": true
+  },
+  {
+    "id": "SEC-003",
+    "title": "Regular Security Patching",
+    "description": "Ensure all systems are regularly patched with the latest security updates",
+    "severity": "high",
+    "category": "System Maintenance",
+    "requirements": [
+      "Monthly patch cycle implemented",
+      "Critical patches applied within 72 hours"
+    ],
+    "remediation": "Implement automated patch management system",
+    "automated": true
+  },
+  {
+    "id": "SEC-004",
+    "title": "Network Segregation",
+    "description": "Implement network segregation to isolate critical systems",
+    "severity": "medium",
+    "category": "Network Security",
+    "requirements": [
+      "VLAN configuration for different system types",
+      "Firewall rules between segments"
+    ],
+    "remediation": "Configure network segmentation using VLANs and firewall rules",
+    "automated": false
+  },
+  {
+    "id": "SEC-005",
+    "title": "Log Management",
+    "description": "Implement centralized logging and log review processes",
+    "severity": "medium",
+    "category": "Monitoring",
+    "requirements": [
+      "Centralized log server configured",
+      "Log retention policy defined",
+      "Regular log review process established"
+    ],
+    "remediation": "Deploy SIEM solution and configure log forwarding from all systems",
+    "automated": true
+  }
+] 

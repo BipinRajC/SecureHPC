@@ -1,0 +1,286 @@
+[
+  {
+    "id": "nist-800-53",
+    "name": "NIST 800-53",
+    "version": "Rev 5",
+    "description": "NIST Special Publication 800-53 provides a catalog of security and privacy controls for federal information systems and organizations.",
+    "controls": [
+      {
+        "id": "AC-1",
+        "title": "Access Control Policy and Procedures",
+        "description": "The organization develops, documents, and disseminates an access control policy.",
+        "category": "Access Control",
+        "severity": "high",
+        "remediation": "Implement a comprehensive access control policy with regular reviews."
+      }
+    ],
+    "supportedTools": [
+      "wazuh",
+      "openscap",
+      "lynis"
+    ],
+    "status": "not-assessed",
+    "compliantCount": 0,
+    "totalControls": 1,
+    "createdAt": "2023-08-10T12:00:00.000Z",
+    "updatedAt": "2023-08-10T12:00:00.000Z"
+  },
+  {
+    "id": "cis-controls",
+    "name": "CIS Controls",
+    "version": "8.0",
+    "description": "The CIS Controls are a prioritized set of actions to protect organizations and data from cyber attacks.",
+    "controls": [
+      {
+        "id": "CIS-1",
+        "title": "Inventory and Control of Hardware Assets",
+        "description": "Actively manage all hardware devices on the network.",
+        "category": "Asset Management",
+        "severity": "high",
+        "remediation": "Maintain an accurate inventory of all hardware assets connected to the network."
+      }
+    ],
+    "supportedTools": [
+      "wazuh",
+      "openscap",
+      "lynis"
+    ],
+    "status": "not-assessed",
+    "compliantCount": 0,
+    "totalControls": 1,
+    "createdAt": "2023-08-10T12:00:00.000Z",
+    "updatedAt": "2023-08-10T12:00:00.000Z"
+  },
+  {
+    "id": "pci-dss",
+    "name": "PCI DSS",
+    "version": "4.0",
+    "description": "The Payment Card Industry Data Security Standard (PCI DSS) is a security standard for organizations that handle credit card data.",
+    "controls": [
+      {
+        "id": "PCI-1",
+        "title": "Install and maintain a firewall",
+        "description": "Install and maintain a firewall configuration to protect cardholder data.",
+        "category": "Network Security",
+        "severity": "critical",
+        "remediation": "Implement firewalls between all wireless networks and the cardholder data environment."
+      }
+    ],
+    "supportedTools": [
+      "wazuh",
+      "openscap",
+      "lynis"
+    ],
+    "status": "not-assessed",
+    "compliantCount": 0,
+    "totalControls": 1,
+    "createdAt": "2023-08-10T12:00:00.000Z",
+    "updatedAt": "2023-08-10T12:00:00.000Z"
+  },
+  {
+    "id": "1747249239262",
+    "name": "QuantumCompliance",
+    "version": "1.0.0",
+    "description": "advanced scanning",
+    "controls": [
+      {
+        "id": "HPC-001",
+        "name": "Secure User Authentication",
+        "description": "Implement strong authentication mechanisms for all HPC system users",
+        "category": "Access Control",
+        "severity": "high",
+        "requirements": [
+          "Use multi-factor authentication",
+          "Implement password complexity requirements",
+          "Enforce regular password rotation"
+        ],
+        "remediation": "Configure LDAP/Active Directory integration with MFA support",
+        "references": [
+          "NIST SP 800-53 AC-2",
+          "CIS HPC Benchmark v1.0"
+        ]
+      },
+      {
+        "id": "HPC-002",
+        "name": "Network Segmentation",
+        "description": "Implement proper network segmentation for HPC clusters",
+        "category": "Network Security",
+        "severity": "critical",
+        "requirements": [
+          "Separate compute nodes from management network",
+          "Implement VLANs for different node types",
+          "Use firewalls between network segments"
+        ],
+        "remediation": "Configure network switches and firewalls according to security zones",
+        "references": [
+          "NIST SP 800-53 SC-7",
+          "CIS HPC Benchmark v1.0"
+        ]
+      },
+      {
+        "id": "HPC-003",
+        "name": "Job Scheduling Security",
+        "description": "Implement secure job scheduling and resource allocation",
+        "category": "Resource Management",
+        "severity": "high",
+        "requirements": [
+          "Implement job priority and fair share policies",
+          "Enforce resource limits per user/group",
+          "Monitor and log job scheduling activities"
+        ],
+        "remediation": "Configure SLURM/PBS with security policies and monitoring",
+        "references": [
+          "NIST SP 800-53 AC-6",
+          "CIS HPC Benchmark v1.0"
+        ]
+      },
+      {
+        "id": "HPC-004",
+        "name": "Data Encryption",
+        "description": "Implement encryption for sensitive data at rest and in transit",
+        "category": "Data Protection",
+        "severity": "critical",
+        "requirements": [
+          "Encrypt data at rest using strong encryption",
+          "Use TLS for data in transit",
+          "Implement key management procedures"
+        ],
+        "remediation": "Configure LUKS for disk encryption and TLS for network traffic",
+        "references": [
+          "NIST SP 800-53 SC-28",
+          "CIS HPC Benchmark v1.0"
+        ]
+      },
+      {
+        "id": "HPC-005",
+        "name": "System Monitoring",
+        "description": "Implement comprehensive system monitoring and logging",
+        "category": "Monitoring",
+        "severity": "high",
+        "requirements": [
+          "Monitor system resources and performance",
+          "Log security events and system changes",
+          "Implement centralized logging"
+        ],
+        "remediation": "Deploy monitoring tools like Prometheus and ELK stack",
+        "references": [
+          "NIST SP 800-53 AU-2",
+          "CIS HPC Benchmark v1.0"
+        ]
+      }
+    ],
+    "supportedTools": [
+      "wazuh",
+      "openscap",
+      "lynis"
+    ],
+    "status": "not-assessed",
+    "compliantCount": 0,
+    "totalControls": 5,
+    "createdAt": "2025-05-14T19:00:39.262Z",
+    "updatedAt": "2025-05-14T19:00:39.262Z"
+  },
+  {
+    "id": "1747298635522",
+    "name": "hpe",
+    "version": "2.0.0",
+    "description": "kjdfijowebfui",
+    "controls": [
+      {
+        "id": "HPC-001",
+        "name": "Secure User Authentication",
+        "description": "Implement strong authentication mechanisms for all HPC system users",
+        "category": "Access Control",
+        "severity": "high",
+        "requirements": [
+          "Use multi-factor authentication",
+          "Implement password complexity requirements",
+          "Enforce regular password rotation"
+        ],
+        "remediation": "Configure LDAP/Active Directory integration with MFA support",
+        "references": [
+          "NIST SP 800-53 AC-2",
+          "CIS HPC Benchmark v1.0"
+        ]
+      },
+      {
+        "id": "HPC-002",
+        "name": "Network Segmentation",
+        "description": "Implement proper network segmentation for HPC clusters",
+        "category": "Network Security",
+        "severity": "critical",
+        "requirements": [
+          "Separate compute nodes from management network",
+          "Implement VLANs for different node types",
+          "Use firewalls between network segments"
+        ],
+        "remediation": "Configure network switches and firewalls according to security zones",
+        "references": [
+          "NIST SP 800-53 SC-7",
+          "CIS HPC Benchmark v1.0"
+        ]
+      },
+      {
+        "id": "HPC-003",
+        "name": "Job Scheduling Security",
+        "description": "Implement secure job scheduling and resource allocation",
+        "category": "Resource Management",
+        "severity": "high",
+        "requirements": [
+          "Implement job priority and fair share policies",
+          "Enforce resource limits per user/group",
+          "Monitor and log job scheduling activities"
+        ],
+        "remediation": "Configure SLURM/PBS with security policies and monitoring",
+        "references": [
+          "NIST SP 800-53 AC-6",
+          "CIS HPC Benchmark v1.0"
+        ]
+      },
+      {
+        "id": "HPC-004",
+        "name": "Data Encryption",
+        "description": "Implement encryption for sensitive data at rest and in transit",
+        "category": "Data Protection",
+        "severity": "critical",
+        "requirements": [
+          "Encrypt data at rest using strong encryption",
+          "Use TLS for data in transit",
+          "Implement key management procedures"
+        ],
+        "remediation": "Configure LUKS for disk encryption and TLS for network traffic",
+        "references": [
+          "NIST SP 800-53 SC-28",
+          "CIS HPC Benchmark v1.0"
+        ]
+      },
+      {
+        "id": "HPC-005",
+        "name": "System Monitoring",
+        "description": "Implement comprehensive system monitoring and logging",
+        "category": "Monitoring",
+        "severity": "high",
+        "requirements": [
+          "Monitor system resources and performance",
+          "Log security events and system changes",
+          "Implement centralized logging"
+        ],
+        "remediation": "Deploy monitoring tools like Prometheus and ELK stack",
+        "references": [
+          "NIST SP 800-53 AU-2",
+          "CIS HPC Benchmark v1.0"
+        ]
+      }
+    ],
+    "supportedTools": [
+      "wazuh",
+      "openscap",
+      "lynis"
+    ],
+    "status": "not-assessed",
+    "compliantCount": 0,
+    "totalControls": 5,
+    "createdAt": "2025-05-15T08:43:55.522Z",
+    "updatedAt": "2025-05-15T08:43:55.522Z"
+  }
+]

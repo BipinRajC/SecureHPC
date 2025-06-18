@@ -1,0 +1,135 @@
+{
+  "reportId": "report-compliance-1747210603412-94dfc",
+  "title": "CIS Compliance Analysis Report",
+  "description": "",
+  "analysisType": "compliance",
+  "framework": "cis",
+  "timestamp": "2025-05-14T08:16:43.414Z",
+  "format": "json",
+  "analysis": {
+    "summary": "Security analysis reveals a 50.0% compliance rate with CIS standards. \n      The scan identified 1 non-compliant controls requiring remediation, \n      including 0 critical and 0 high severity issues that represent significant security risks.",
+    "complianceStatus": {
+      "overallCompliance": 50,
+      "rating": "Minimal Compliance",
+      "maturityLevel": {
+        "level": "Repeatable (2)",
+        "description": "Basic security management processes established"
+      },
+      "frameworkSpecificStatus": {
+        "implementationGroups": {
+          "ig1": {
+            "description": "Basic CIS Controls - Essential cyber hygiene",
+            "compliance": 65
+          },
+          "ig2": {
+            "description": "Foundational CIS Controls - Security best practices",
+            "compliance": 40
+          },
+          "ig3": {
+            "description": "Organizational CIS Controls - Advanced security capabilities",
+            "compliance": 25
+          }
+        }
+      }
+    },
+    "issues": [
+      {
+        "id": "CIS-1.4",
+        "title": "Maintain Detailed Asset Inventory",
+        "severity": "high",
+        "description": "Maintain detailed asset inventory information in a database or spreadsheet, with ability to track system owner.",
+        "impact": "Without a complete asset inventory, the organization cannot effectively manage security risks, leading to potential unpatched systems and security blind spots.",
+        "remediation": "Implement an automated asset discovery tool and maintain a centralized inventory database with ownership and patch status information."
+      },
+      {
+        "id": "CIS-3.11",
+        "title": "Encrypt Sensitive Data in Transit",
+        "severity": "critical",
+        "description": "Encrypt Sensitive Data in Transit across trusted and untrusted networks.",
+        "impact": "Unencrypted sensitive data in transit can be intercepted, leading to data breaches and potential regulatory violations.",
+        "remediation": "Implement TLS 1.2+ for all data transmissions, configure web servers to use HTTPS, and use secure transfer protocols like SFTP instead of FTP."
+      }
+    ],
+    "recommendations": [
+      {
+        "id": "REC-1",
+        "title": "Implement Comprehensive Patch Management",
+        "priority": "high",
+        "description": "Establish a robust patch management process to address identified vulnerabilities and ensure systems are kept up-to-date with the latest security patches.",
+        "steps": [
+          "Inventory all systems and applications requiring updates",
+          "Define patch testing procedures to validate patches before deployment",
+          "Establish maintenance windows for patch deployment",
+          "Implement automated patch deployment where possible",
+          "Maintain documentation of patch levels and exceptions"
+        ]
+      },
+      {
+        "id": "REC-2",
+        "title": "Enhance Access Control Mechanisms",
+        "priority": "critical",
+        "description": "Strengthen access controls across the environment to restrict unauthorized access to sensitive systems and data.",
+        "steps": [
+          "Implement multi-factor authentication for all administrative accounts",
+          "Review and enforce least privilege access principles",
+          "Enable account lockout after repeated failed attempts",
+          "Implement privileged access management for administrative accounts",
+          "Regularly audit access control configurations"
+        ]
+      },
+      {
+        "id": "REC-3",
+        "title": "Improve Security Monitoring Capabilities",
+        "priority": "medium",
+        "description": "Enhance security monitoring to detect and respond to potential security incidents more effectively.",
+        "steps": [
+          "Centralize security logs to a SIEM solution",
+          "Implement automated alerting for suspicious activities",
+          "Establish baseline normal behavior for systems and networks",
+          "Develop and test incident response procedures",
+          "Configure endpoint detection and response tools on critical systems"
+        ]
+      }
+    ],
+    "overallRiskRating": "High Risk",
+    "maturityLevel": {
+      "level": "Repeatable (2)",
+      "description": "Basic security management processes established"
+    },
+    "frameworkSpecific": {
+      "controlFamilies": {
+        "Basic CIS Controls (IG1)": {
+          "description": "Essential cyber hygiene - the foundation of a cybersecurity program",
+          "compliance": 60,
+          "findings": "0 non-compliant controls in IG1"
+        },
+        "Security Best Practices (IG2)": {
+          "description": "Security best practices for medium-sized organizations",
+          "compliance": 35,
+          "findings": "0 non-compliant controls in IG2"
+        },
+        "Advanced Security (IG3)": {
+          "description": "Advanced security capabilities for complex organizations",
+          "compliance": 20,
+          "findings": "0 non-compliant controls in IG3"
+        }
+      },
+      "overallAssessment": "The system demonstrates partial compliance with CIS Controls, with significant gaps in the Advanced Security controls. Basic cyber hygiene controls are generally well-implemented, but security best practices need improvement."
+    }
+  },
+  "rawData": {
+    "agents": [
+      {
+        "status": "active"
+      }
+    ],
+    "vulnerabilities": [],
+    "sca": [
+      {
+        "pass": 1,
+        "fail": 1
+      }
+    ],
+    "framework": "cis"
+  }
+}

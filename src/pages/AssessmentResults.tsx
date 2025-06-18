@@ -131,7 +131,7 @@ const AssessmentResults: React.FC = () => {
                   <tr key={assessment.id} className="hover:bg-background-light transition-colors">
                     <td className="px-4 py-3 font-medium text-white">{assessment.name}</td>
                     <td className="px-4 py-3">{getFrameworkName(assessment.frameworkId)}</td>
-                    <td className="px-4 py-3">{format(new Date(assessment.date), 'MMM d, yyyy')}</td>
+                    <td className="px-4 py-3">{assessment.date ? new Date(assessment.date).toLocaleString() : '-'}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center">
                         {getStatusIcon(assessment.status)}

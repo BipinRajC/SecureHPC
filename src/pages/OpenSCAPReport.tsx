@@ -1,45 +1,85 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { AlertTriangle, ArrowLeft, Download, RefreshCw, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useComplianceStore } from '../store/complianceStore';
 
 const OpenSCAPReport: React.FC = () => {
   const [loading, setLoading] = useState(true);
+  const [scanProgress, setScanProgress] = useState<string>('Initializing...');
+  const [currentScanId, setCurrentScanId] = useState<string | null>(null);
   const navigate = useNavigate();
   
   const { 
     openscapReportHtml, 
     error,
     loading: storeLoading,
-    runOpenScapScan
+    runOpenScapScan,
+    getOpenScapScanStatus,
+    getOpenScapResults
   } = useComplianceStore();
 
+  const pollScanProgress = useCallback(async (scanId: string) => {
+    try {
+      const status = await getOpenScapScanStatus(scanId);
+      
+      if (status.status === 'running') {
+        setScanProgress(status.message || 'Running OpenSCAP scan...');
+        // Continue polling
+        setTimeout(() => pollScanProgress(scanId), 2000);
+      } else if (status.status === 'completed') {
+        setScanProgress('Scan completed! Loading results...');
+        // Fetch the results
+        await getOpenScapResults(scanId);
+        setLoading(false);
+        setCurrentScanId(null);
+      } else if (status.status === 'error') {
+        console.error('Scan failed:', status.message);
+        setLoading(false);
+        setCurrentScanId(null);
+      }
+    } catch (err) {
+      console.error('Error polling scan progress:', err);
+      setLoading(false);
+      setCurrentScanId(null);
+    }
+  }, [getOpenScapScanStatus, getOpenScapResults]);
+
   useEffect(() => {
-    const fetchReport = async () => {
+    const initializeScan = async () => {
       setLoading(true);
+      setScanProgress('Initializing...');
       
       try {
         // Run the OpenSCAP scan if not already done
         if (!openscapReportHtml) {
-          await runOpenScapScan();
+          const scanId = await runOpenScapScan();
+          if (scanId) {
+            setCurrentScanId(scanId);
+            pollScanProgress(scanId);
+          }
+        } else {
+          setLoading(false);
         }
       } catch (err) {
-        console.error('Error fetching OpenSCAP report:', err);
-      } finally {
+        console.error('Error initializing OpenSCAP scan:', err);
         setLoading(false);
       }
     };
 
-    fetchReport();
-  }, [openscapReportHtml, runOpenScapScan]);
+    initializeScan();
+  }, [openscapReportHtml, runOpenScapScan, pollScanProgress]);
 
   const handleRescan = async () => {
     setLoading(true);
+    setScanProgress('Starting new scan...');
     try {
-      await runOpenScapScan();
+      const scanId = await runOpenScapScan();
+      if (scanId) {
+        setCurrentScanId(scanId);
+        pollScanProgress(scanId);
+      }
     } catch (err) {
       console.error('Error rescanning:', err);
-    } finally {
       setLoading(false);
     }
   };
@@ -127,10 +167,15 @@ const OpenSCAPReport: React.FC = () => {
       {isLoading ? (
         <div className="flex flex-col items-center justify-center h-96 text-center">
           <div className="animate-pulse text-primary-400 mb-4">
-            Running OVAL Security Assessment...
+            {scanProgress}
           </div>
+          {currentScanId && (
+            <div className="text-xs text-neutral-500 mb-4">
+              Scan ID: {currentScanId}
+            </div>
+          )}
           <div className="text-sm text-neutral-400 max-w-md">
-            <p className="mb-2">Executing:</p>
+            <p className="mb-2">Executing OpenSCAP OVAL Assessment:</p>
             <pre className="bg-background-light p-2 rounded text-left text-xs overflow-x-auto mb-2">
               wget https://security-metadata.canonical.com/oval/com.ubuntu.$(lsb_release -cs).usn.oval.xml.bz2
             </pre>

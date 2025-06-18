@@ -97,215 +97,113 @@ export const cisControls: ComplianceControl[] = [
   },
 ];
 
-// Mock compliance frameworks
+// Mock frameworks data
 export const mockFrameworks: ComplianceFramework[] = [
   {
-    id: 'pci-dss',
-    name: 'PCI-DSS',
+    id: 'framework-1',
+    name: 'CIS Benchmark',
+    description: 'Center for Internet Security benchmarks for secure configuration',
+    category: 'System Hardening',
+    version: '1.0.0',
+    status: 'compliant',
+    compliantCount: 85,
+    totalControls: 100,
+    lastAssessed: '2023-03-15T10:00:00Z',
+    findings: []
+  },
+  {
+    id: 'framework-2',
+    name: 'NIST SP 800-53',
+    description: 'Security controls for federal information systems',
+    category: 'Compliance',
+    version: '5.1',
+    status: 'partially-compliant',
+    compliantCount: 120,
+    totalControls: 200,
+    lastAssessed: '2023-03-10T08:30:00Z',
+    findings: []
+  },
+  {
+    id: 'framework-3',
+    name: 'PCI DSS',
     description: 'Payment Card Industry Data Security Standard',
     category: 'Financial',
     version: '4.0',
-    status: 'not-assessed' as ComplianceStatus,
-    compliantCount: 0,
-    totalControls: 12,
-    lastAssessed: null
-  },
-  {
-    id: 'hipaa',
-    name: 'HIPAA',
-    description: 'Health Insurance Portability and Accountability Act',
-    category: 'Healthcare',
-    version: '2.0',
-    status: 'not-assessed' as ComplianceStatus,
-    compliantCount: 0,
-    totalControls: 18,
-    lastAssessed: null
-  },
-  {
-    id: 'gdpr',
-    name: 'GDPR',
-    description: 'General Data Protection Regulation',
-    category: 'Privacy',
-    version: '1.0',
-    status: 'not-assessed' as ComplianceStatus,
-    compliantCount: 0,
-    totalControls: 10,
-    lastAssessed: null
-  },
-  {
-    id: 'nist-800-53',
-    name: 'NIST 800-53',
-    description: 'National Institute of Standards and Technology Special Publication 800-53',
-    category: 'Government',
-    version: 'Rev. 5',
-    status: 'not-assessed' as ComplianceStatus,
-    compliantCount: 0,
-    totalControls: 20,
-    lastAssessed: null
+    status: 'non-compliant',
+    compliantCount: 45,
+    totalControls: 120,
+    lastAssessed: '2023-03-05T14:15:00Z',
+    findings: []
   }
 ];
 
-// Mock tool integrations
+// Mock tools data
 export const mockTools: Tool[] = [
   {
-    id: 'lynis',
+    id: 'tool-1',
     name: 'Lynis',
     description: 'Security auditing tool for Unix/Linux systems',
-    status: 'inactive' as ToolStatus,
+    status: 'active',
     type: 'scanner',
     version: '3.0.8',
-    supportedFrameworks: ['pci-dss', 'hipaa', 'nist-800-53'],
-    lastRun: null
+    supportedFrameworks: ['CIS Benchmark', 'NIST SP 800-53'],
+    lastRun: '2023-03-15T10:00:00Z'
   },
   {
-    id: 'openscap',
+    id: 'tool-2',
     name: 'OpenSCAP',
-    description: 'Security compliance and vulnerability scanning',
-    status: 'inactive' as ToolStatus,
-    type: 'scanner',
-    version: '1.3.6',
-    supportedFrameworks: ['pci-dss', 'nist-800-53'],
-    lastRun: null
-  },
-  {
-    id: 'wazuh',
-    name: 'Wazuh',
-    description: 'Open source security monitoring solution',
-    status: 'inactive' as ToolStatus,
-    type: 'scanner',
-    version: '4.4.0',
-    supportedFrameworks: ['pci-dss', 'hipaa', 'gdpr', 'nist-800-53'],
-    lastRun: null
-  },
-  {
-    id: 'prowler',
-    name: 'Prowler',
-    description: 'Open source security tool to perform AWS security best practices assessments, audits, incident response, and compliance.',
-    type: 'auditor',
-    status: 'inactive',
-    version: '3.0.0',
-    supportedFrameworks: ['cis-controls'],
-    configOptions: [
-      {
-        name: 'aws_region',
-        type: 'text',
-        required: true,
-        defaultValue: 'us-east-1'
-      },
-      {
-        name: 'aws_profile',
-        type: 'text',
-        required: false
-      },
-      {
-        name: 'compliance_framework',
-        type: 'select',
-        required: true,
-        options: ['cis', 'hipaa', 'gdpr', 'all'],
-        defaultValue: 'cis'
-      }
-    ]
-  },
-  {
-    id: 'custom-scanner',
-    name: 'HPC Custom Scanner',
-    description: 'Custom-built security scanner for HPC environments.',
-    type: 'scanner',
+    description: 'SCAP content interpretation, evaluation and remediation',
     status: 'active',
-    version: '1.2.3',
-    lastRun: '2025-03-05T11:45:00Z',
-    supportedFrameworks: ['custom-hpc'],
-    configOptions: [
-      {
-        name: 'scan_depth',
-        type: 'select',
-        required: true,
-        options: ['quick', 'standard', 'deep'],
-        defaultValue: 'standard'
-      },
-      {
-        name: 'scan_components',
-        type: 'text',
-        required: true,
-        defaultValue: 'compute,storage,network,scheduler'
-      },
-      {
-        name: 'enable_remediation',
-        type: 'boolean',
-        required: false,
-        defaultValue: false
-      }
-    ]
+    type: 'scanner',
+    version: '1.3.7',
+    supportedFrameworks: ['CIS Benchmark', 'NIST SP 800-53', 'PCI DSS'],
+    lastRun: '2023-03-14T09:30:00Z'
+  },
+  {
+    id: 'tool-3',
+    name: 'Wazuh',
+    description: 'Security monitoring, threat detection and response',
+    status: 'configuring',
+    type: 'monitor',
+    version: '4.4.0',
+    supportedFrameworks: ['PCI DSS', 'GDPR'],
+    lastRun: null
   }
 ];
 
-// Mock assessment data
+// Mock assessments data
 export const mockAssessments: Assessment[] = [
   {
     id: 'assessment-1',
-    name: 'Monthly PCI-DSS Scan',
-    description: 'Monthly compliance scan for PCI-DSS requirements',
-    frameworkId: 'pci-dss',
-    toolId: 'lynis',
+    name: 'Weekly CIS Scan',
+    description: 'Weekly system scan against CIS benchmarks',
+    frameworkId: 'framework-1',
+    toolId: 'tool-1',
     status: 'completed',
-    date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-    completedDate: new Date(Date.now() - 29 * 24 * 60 * 60 * 1000).toISOString(),
+    date: '2023-03-15T10:00:00Z',
+    completedDate: '2023-03-15T10:15:30Z',
     schedule: {
-      frequency: 'monthly',
-      day: 1,
-      time: '01:00'
+      frequency: 'weekly',
+      day: 1, // Monday
+      time: '10:00'
     },
     result: {
       score: 85,
-    findings: [
-      {
-          controlId: 'AUTH-01',
-          status: 'non-compliant' as ComplianceStatus,
-          details: 'Password policy not enforced',
-        severity: 'high'
-      },
-      {
-          controlId: 'ENCR-02',
-          status: 'compliant' as ComplianceStatus,
-          details: 'Disk encryption enabled',
-          severity: 'medium'
-      }
-      ]
+      findings: []
     }
   },
   {
     id: 'assessment-2',
-    name: 'Weekly HIPAA Check',
-    description: 'Weekly compliance check for HIPAA requirements',
-    frameworkId: 'hipaa',
-    toolId: 'openscap',
+    name: 'Monthly NIST Assessment',
+    description: 'Monthly compliance check for NIST requirements',
+    frameworkId: 'framework-2',
+    toolId: 'tool-2',
     status: 'scheduled',
-    date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    date: '2023-04-01T09:00:00Z',
     schedule: {
-      frequency: 'weekly',
-      day: 1, // Monday
-      time: '02:00'
-    }
-  },
-  {
-    id: 'assessment-3',
-    name: 'GDPR Assessment',
-    description: 'Assessment of GDPR compliance',
-    frameworkId: 'gdpr',
-    toolId: 'wazuh',
-    status: 'failed',
-    date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-    completedDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-    result: {
-      score: 0,
-      findings: [
-        {
-          controlId: 'ERROR-01',
-          status: 'non-compliant' as ComplianceStatus,
-          details: 'Failed to connect to scanning tool',
-          severity: 'critical'
-        }
-      ]
+      frequency: 'monthly',
+      day: 1,
+      time: '09:00'
     }
   }
 ];
